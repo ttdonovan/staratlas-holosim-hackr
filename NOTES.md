@@ -16,7 +16,7 @@ $ cargo install just
 
 ```bash
 $ rustc --version
-rustc 1.87.0 (17067e9ac 2025-05-09)
+rustc 1.89.0 (29483883e 2025-08-04)
 ```
 
 ### Solana CLI
@@ -24,9 +24,10 @@ rustc 1.87.0 (17067e9ac 2025-05-09)
 [https://solana.com/docs/intro/installation#install-the-solana-cli]()
 
 ```bash
+# agave-install update
 $ source ~/.profile
 $ solana --version
-solana-cli 2.1.22 (src:26944979; feat:1416569292, client:Agave)
+solana-cli 2.3.8 (src:72664e23; feat:3640012085, client:Agave)
 
 $ solana config get
 $ solana config set --url https://rpc.ironforge.network/devnet?apiKey=01JEB7YQ0YPK31WQTC0VQ5Y9YP
@@ -39,6 +40,7 @@ $ solana config set --url https://rpc.ironforge.network/devnet?apiKey=01JEB7YQ0Y
 [https://bun.sh/]()
 
 ```bash
+# bun update
 $ bun --version
 1.2.15
 
@@ -83,7 +85,19 @@ $ solana balance
 ```bash
 $ solana program dump SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF programs/holosim/SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF.so
 $ solana program dump PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ programs/player_profile/PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ.so
-$ solana program dump pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj programs/profile_factin/pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj.so
+$ solana program dump pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj programs/profile_faction/pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj.so
+```
+
+## Star Atlas: C4 Sage
+
+[https://explorer.atlasnet.staratlas.cloud/]()
+
+`https://rpc.ironforge.network/devnet?apiKey=01JEB7YQ0YPK31WQTC0VQ5Y9YP`
+
+* C4 Sage - [C4SAgeKLgb3pTLWhVr6NRwWyYFuTR7ZeSXFrzoLwfMzF](https://explorer.atlasnet.staratlas.cloud/address/C4SAgeKLgb3pTLWhVr6NRwWyYFuTR7ZeSXFrzoLwfMzF)
+
+```bash
+$ solana program dump C4SAgeKLgb3pTLWhVr6NRwWyYFuTR7ZeSXFrzoLwfMzF programs/c4_sage/C4SAgeKLgb3pTLWhVr6NRwWyYFuTR7ZeSXFrzoLwfMzF.so
 ```
 
 ## Rust Crates
