@@ -7,6 +7,10 @@ edition.workspace = true
 name = "hackr-ixproc"
 path = "src/main.rs"
 
+[features]
+default = []
+database = ["sqlx", "uuid"]
+
 [dependencies]
 # Async runtime & web
 tokio = { version = "1.45", features = ["full"] }
@@ -32,6 +36,13 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # Error handling
 anyhow = "1.0"
 thiserror = "2.0"
+
+# Database (optional)
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "sqlite", "chrono", "uuid"], optional = true }
+uuid = { version = "1.0", features = ["v4"], optional = true }
+
+# CLI
+clap = { version = "4.0", features = ["derive"] }
 
 # Other
 futures-util = "0.3"
