@@ -12,7 +12,7 @@ use data::GameData;
 use camera::Camera2D;
 use ui::UIState;
 use input::handle_input;
-use render::{draw_sectors, draw_starbases, draw_ui, draw_minimap, draw_starbase_modal, draw_grid};
+use render::{draw_sectors, draw_starbases, draw_ui, draw_minimap, draw_starbase_modal, draw_sector_modal, draw_grid, draw_origin_marker, handle_click};
 
 #[macroquad::main("Star Atlas Galaxy Map")]
 async fn main() {
@@ -89,6 +89,9 @@ async fn main() {
         // Handle input
         handle_input(&mut camera, &mut ui_state);
         
+        // Handle clicks
+        handle_click(&game_data, &sector_positions, &camera, &mut ui_state);
+        
         // Clear background
         clear_background(Color::from_rgba(10, 10, 25, 255));
         
@@ -98,6 +101,7 @@ async fn main() {
         // Draw grid if enabled
         if ui_state.show_grid {
             draw_grid(&cam_matrix, &camera);
+            draw_origin_marker(&cam_matrix, &camera);
         }
         
         // Draw sectors
@@ -109,8 +113,11 @@ async fn main() {
         // Draw UI overlay
         draw_ui(&game_data, &ui_state, &camera);
         
-        // Draw starbase modal if hovering
+        // Draw starbase modal if hovering or pinned
         draw_starbase_modal(&ui_state, &game_data, &mine_item_names, &resource_locations, &camera);
+        
+        // Draw sector modal if pinned
+        draw_sector_modal(&ui_state, &game_data, &camera);
         
         // Draw minimap
         draw_minimap(&sector_positions, &camera);

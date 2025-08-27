@@ -22,6 +22,6 @@ pub fn draw_ui(game_data: &GameData, ui_state: &UIState, camera: &Camera2D) {
         draw_text(&format!("Camera: ({:.1}, {:.1})", camera.position.x, camera.position.y), 20.0, 140.0, 14.0, GRAY);
         draw_text(&format!("Zoom: {:.2}x", camera.zoom), 20.0, 160.0, 14.0, GRAY);
         
-        draw_text("F1: Info | F2: Search | G: Grid | Scroll: Zoom", 20.0, 190.0, 12.0, GRAY);
+        draw_text("F1: Info | G: Grid | Click: Pin | ESC: Clear", 20.0, 190.0, 12.0, GRAY);
     }
 }

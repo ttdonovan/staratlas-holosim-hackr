@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use nalgebra::Vector2;
 
 use crate::data::GameData;
-use crate::ui::UIState;
+use crate::ui::{UIState, PinnedItem};
 use crate::camera::Camera2D;
 use super::utils::transform_point;
 
@@ -41,7 +41,13 @@ pub fn draw_starbases(
                 WHITE
             };
             
-            // Highlight if hovered
+            // Check if this starbase is pinned
+            let is_pinned = matches!(
+                &ui_state.pinned_item,
+                Some(PinnedItem::Starbase(s)) if s.seq_id == starbase.seq_id
+            );
+            
+            // Highlight if hovered or pinned
             let color = if is_hovered {
                 Color::from_rgba(
                     (base_color.r * 255.0 * 1.3).min(255.0) as u8,
@@ -49,13 +55,25 @@ pub fn draw_starbases(
                     (base_color.b * 255.0 * 1.3).min(255.0) as u8,
                     255
                 )
+            } else if is_pinned {
+                Color::from_rgba(
+                    (base_color.r * 255.0 * 1.2).min(255.0) as u8,
+                    (base_color.g * 255.0 * 1.2).min(255.0) as u8,
+                    (base_color.b * 255.0 * 1.2).min(255.0) as u8,
+                    255
+                )
             } else {
                 base_color
             };
             
-            let size = if is_hovered { 8.0 } else { 6.0 };
+            let size = if is_hovered || is_pinned { 8.0 } else { 6.0 };
             draw_circle(screen_pos.x, screen_pos.y, size, color);
             draw_circle_lines(screen_pos.x, screen_pos.y, size + 2.0, 2.0, color);
+            
+            // Draw pin indicator if pinned
+            if is_pinned {
+                draw_circle_lines(screen_pos.x, screen_pos.y, size + 4.0, 1.0, Color::from_rgba(255, 255, 150, 200));
+            }
         }
     }
     
@@ -69,7 +87,21 @@ pub fn draw_starbase_modal(
     resource_locations: &HashMap<String, Vec<String>>,
     camera: &Camera2D
 ) {
-    if let Some(starbase) = &ui_state.hovered_starbase {
+    // Show modal for either hovered starbase or pinned starbase
+    let starbase = if let Some(starbase) = &ui_state.hovered_starbase {
+        Some(starbase)
+    } else if let Some(PinnedItem::Starbase(starbase)) = &ui_state.pinned_item {
+        Some(starbase)
+    } else {
+        None
+    };
+    
+    if let Some(starbase) = starbase {
+        // Check if this is pinned
+        let is_pinned = matches!(
+            &ui_state.pinned_item,
+            Some(PinnedItem::Starbase(s)) if s.seq_id == starbase.seq_id
+        );
         let mouse_pos = mouse_position();
         
         // Scale modal size based on zoom level
@@ -120,6 +152,14 @@ pub fn draw_starbase_modal(
         
         // Title
         draw_text(&starbase.name, modal_x + 10.0, modal_y + 25.0 * zoom_scale, title_font_size, WHITE);
+        
+        // Pin indicator
+        if is_pinned {
+            draw_text("📍", modal_x + modal_width - 40.0 * zoom_scale, modal_y + 25.0 * zoom_scale, title_font_size, Color::from_rgba(255, 255, 150, 255));
+        }
+        
+        // Close button hint
+        draw_text("ESC to close", modal_x + modal_width - 90.0 * zoom_scale, modal_y + modal_height - 20.0 * zoom_scale, small_font_size * 0.8, Color::from_rgba(150, 150, 150, 200));
         
         let mut y_offset = modal_y + 60.0 * zoom_scale;
         

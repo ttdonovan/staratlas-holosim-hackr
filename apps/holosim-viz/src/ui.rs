@@ -1,5 +1,11 @@
 use nalgebra::Vector2;
-use ui_holosim::StarbaseUI;
+use ui_holosim::{StarbaseUI, SectorUI};
+
+#[derive(Clone, Debug)]
+pub enum PinnedItem {
+    Starbase(StarbaseUI),
+    Sector(SectorUI),
+}
 
 pub struct UIState {
     pub show_info_panel: bool,
@@ -7,6 +13,7 @@ pub struct UIState {
     pub show_grid: bool,
     pub mouse_world_pos: Vector2<f32>,
     pub hovered_starbase: Option<StarbaseUI>,
+    pub pinned_item: Option<PinnedItem>,
 }
 
 impl UIState {
@@ -17,6 +24,7 @@ impl UIState {
             show_grid: false,
             mouse_world_pos: Vector2::new(0.0, 0.0),
             hovered_starbase: None,
+            pinned_item: None,
         }
     }
 }
