@@ -36,6 +36,19 @@ sa-stats:
 sa-build:
     cargo build -p hackr-saproc --release
 
+# hackr-gamedata (Game Balance Extractor)
+gd-run:
+    cargo run -p hackr-gamedata
+
+gd-run-game GAME_PUBKEY:
+    cargo run -p hackr-gamedata -- --game-pubkey {{GAME_PUBKEY}}
+
+gd-run-json:
+    cargo run -p hackr-gamedata -- --format json
+
+gd-build:
+    cargo build -p hackr-gamedata --release
+
 # Database Management
 db-schema:
     sqlite3 hackr.db ".schema"

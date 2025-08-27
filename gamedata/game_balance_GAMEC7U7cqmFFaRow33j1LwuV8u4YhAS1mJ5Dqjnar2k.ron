@@ -1,0 +1,37 @@
+(
+    game_id: "GAMEC7U7cqmFFaRow33j1LwuV8u4YhAS1mJ5Dqjnar2k",
+    version: 0,
+    update_id: 26,
+    config: (
+        profile: "ADMNTamFis3nVwoWAM7jNfJ8qcxUZbnXJXSpUejbiEdz",
+        points_config: (
+            placeholder: "points_placeholder",
+        ),
+        cargo_config: (
+            placeholder: "cargo_placeholder",
+        ),
+        crafting_config: (
+            placeholder: "crafting_placeholder",
+        ),
+        mints_config: (
+            placeholder: "mints_placeholder",
+        ),
+        vaults_config: (
+            placeholder: "vaults_placeholder",
+        ),
+        risk_zones: (
+            placeholder: "risk_zones_placeholder",
+        ),
+    ),
+    game_state: Some((
+        state_id: "GAMEC7U7cqmFFaRow33j1LwuV8u4YhAS1mJ5Dqjnar2k",
+        version: 0,
+        update_id: 26,
+        fleet_info: (
+            placeholder: "fleet_info_placeholder",
+        ),
+        misc_variables: (
+            placeholder: "misc_variables_placeholder",
+        ),
+    )),
+)

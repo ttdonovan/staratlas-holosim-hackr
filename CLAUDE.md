@@ -200,3 +200,7 @@ cargo run -p holosim-examples --example ch2_get_accounts
 # Monitor program activity example
 cargo run -p holosim-examples --example ch2_pubsub_accounts
 ```
+
+## Claude Memories
+
+- Observed memory: `to meorize` (seems like a misspelled fragment)
