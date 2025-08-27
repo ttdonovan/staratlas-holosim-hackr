@@ -204,3 +204,4 @@ cargo run -p holosim-examples --example ch2_pubsub_accounts
 ## Claude Memories
 
 - Observed memory: `to meorize` (seems like a misspelled fragment)
+- Noted fragment of potential memory to investigate further

@@ -168,7 +168,22 @@ The exported data includes:
   - **Mine Items**: All minable resources
     - Resource name, mint address
     - Hardness, number of resource accounts
-  - **Starbases**: Space station data (when available)
+  - **Starbases**: Space stations
+    - Name, position, faction
+    - Facilities, upkeep balances
+    - HP/SP, upgrade state
+  - **Resources**: Minable resource locations
+    - Location, mine item, richness
+    - Amount mined, current miners
+  - **Sectors**: Map regions/star systems
+    - Coordinates, discoverer, name
+    - Celestial body counts (stars, planets, moons)
+    - Scan data, connections
+  - **Ships**: Ship type definitions
+    - Name, size class, stats
+    - Movement, cargo, and combat capabilities
+  - **Stars**: Star objects in sectors
+    - Name, position, type, size
 
 ## Future Enhancements
 

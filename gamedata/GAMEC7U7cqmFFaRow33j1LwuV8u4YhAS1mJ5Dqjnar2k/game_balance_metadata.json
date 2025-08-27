@@ -1,11 +1,15 @@
 {
   "database_source": "hackr.db",
-  "extracted_at": "2025-08-27T05:08:05.692086810+00:00",
+  "extracted_at": "2025-08-27T06:02:58.555417441+00:00",
   "game_pubkey": "GAMEC7U7cqmFFaRow33j1LwuV8u4YhAS1mJ5Dqjnar2k",
   "game_state_included": true,
   "game_update_id": 26,
   "game_version": 0,
   "mine_item_count": 13,
   "planet_count": 264,
-  "starbase_count": 0
+  "resource_count": 97,
+  "sector_count": 6244,
+  "ship_count": 949,
+  "star_count": 51,
+  "starbase_count": 51
 }

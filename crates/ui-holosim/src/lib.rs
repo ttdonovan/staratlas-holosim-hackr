@@ -5,8 +5,11 @@ pub mod game_state;
 pub mod loot;
 pub mod mine_item;
 pub mod planet;
+pub mod resource;
 pub mod sage_player_profile;
+pub mod sector;
 pub mod ship;
+pub mod star;
 pub mod starbase;
 
 pub use fleet::FleetUI;
@@ -16,8 +19,11 @@ pub use game_state::GameStateUI;
 pub use loot::LootUI;
 pub use mine_item::MineItemUI;
 pub use planet::PlanetUI;
+pub use resource::ResourceUI;
 pub use sage_player_profile::SagePlayerProfileUI;
+pub use sector::SectorUI;
 pub use ship::ShipUI;
+pub use star::StarUI;
 pub use starbase::StarbaseUI;
 
 use thiserror::Error;

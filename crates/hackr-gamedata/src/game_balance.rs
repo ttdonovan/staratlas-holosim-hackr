@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
-use ui_holosim::{GameUI, GameStateUI, PlanetUI, MineItemUI, StarbaseUI};
+use ui_holosim::{
+    GameStateUI, GameUI, MineItemUI, PlanetUI, ResourceUI, SectorUI, ShipUI, StarUI, StarbaseUI,
+};
 
 /// Game balance data structure for export
 /// This represents the core configuration data needed to initialize a game world
@@ -7,47 +9,59 @@ use ui_holosim::{GameUI, GameStateUI, PlanetUI, MineItemUI, StarbaseUI};
 pub struct GameBalance {
     /// Game ID (pubkey)
     pub game_id: String,
-    
+
     /// Version information
     pub version: u8,
     pub update_id: u64,
-    
+
     /// Core game configuration
     pub config: GameConfig,
-    
+
     /// Associated game state (if available)
     pub game_state: Option<GameStateData>,
-    
+
     /// Planets associated with this game
     pub planets: Vec<PlanetUI>,
-    
+
     /// Mine items associated with this game  
     pub mine_items: Vec<MineItemUI>,
-    
+
     /// Starbases associated with this game
     pub starbases: Vec<StarbaseUI>,
+
+    /// Resources (minable locations) in the game
+    pub resources: Vec<ResourceUI>,
+
+    /// Sectors (map regions) in the game
+    pub sectors: Vec<SectorUI>,
+
+    /// Ships (ship types) in the game
+    pub ships: Vec<ShipUI>,
+
+    /// Stars in the game
+    pub stars: Vec<StarUI>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameConfig {
     /// Profile that manages sector permissions
     pub profile: String,
-    
+
     /// Points/scoring configuration
     pub points_config: PointsConfig,
-    
+
     /// Cargo/inventory settings
     pub cargo_config: CargoConfig,
-    
+
     /// Crafting system settings
     pub crafting_config: CraftingConfig,
-    
+
     /// Token mint settings
     pub mints_config: MintsConfig,
-    
+
     /// Vault/treasury settings  
     pub vaults_config: VaultsConfig,
-    
+
     /// Risk zones configuration
     pub risk_zones: RiskZonesConfig,
 }
@@ -76,7 +90,7 @@ pub struct CargoConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CraftingConfig {
-    // TODO: Extract from actual Crafting struct  
+    // TODO: Extract from actual Crafting struct
     pub placeholder: String,
 }
 
@@ -113,12 +127,16 @@ pub struct MiscConfig {
 impl GameBalance {
     /// Create from UI types with additional game data
     pub fn from_ui(
-        game_pubkey: &str, 
-        game: &GameUI, 
+        game_pubkey: &str,
+        game: &GameUI,
         game_state: Option<&GameStateUI>,
         planets: Vec<PlanetUI>,
         mine_items: Vec<MineItemUI>,
         starbases: Vec<StarbaseUI>,
+        resources: Vec<ResourceUI>,
+        sectors: Vec<SectorUI>,
+        ships: Vec<ShipUI>,
+        stars: Vec<StarUI>,
     ) -> Self {
         GameBalance {
             game_id: game_pubkey.to_string(),
@@ -159,14 +177,18 @@ impl GameBalance {
             planets,
             mine_items,
             starbases,
+            resources,
+            sectors,
+            ships,
+            stars,
         }
     }
-    
+
     /// Export to RON format
     pub fn to_ron(&self) -> Result<String, ron::Error> {
         ron::ser::to_string_pretty(self, Default::default())
     }
-    
+
     /// Export to JSON format  
     pub fn to_json(&self) -> Result<String, serde_json::Error> {
         serde_json::to_string_pretty(self)

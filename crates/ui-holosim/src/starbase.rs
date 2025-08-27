@@ -1,6 +1,6 @@
+use crate::UIConversionError;
 use serde::{Deserialize, Serialize};
 use staratlas_holosim::generated::accounts::Starbase;
-use crate::UIConversionError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StarbaseUI {
@@ -42,7 +42,9 @@ impl TryFrom<&Starbase> for StarbaseUI {
 
     fn try_from(starbase: &Starbase) -> Result<Self, Self::Error> {
         // Convert name from bytes to string
-        let name_bytes: Vec<u8> = starbase.name.iter()
+        let name_bytes: Vec<u8> = starbase
+            .name
+            .iter()
             .copied()
             .take_while(|&b| b != 0)
             .collect();

@@ -12,8 +12,8 @@ use crate::discriminator::Discriminators;
 
 // Import UI types
 use ui_holosim::{
-    FleetShipsUI, FleetUI, GameStateUI, GameUI, LootUI, MineItemUI, PlanetUI,
-    SagePlayerProfileUI, ShipUI, StarbaseUI,
+    FleetShipsUI, FleetUI, GameStateUI, GameUI, LootUI, MineItemUI, PlanetUI, ResourceUI,
+    SagePlayerProfileUI, SectorUI, ShipUI, StarUI, StarbaseUI,
 };
 
 pub struct AccountParser {
@@ -126,6 +126,18 @@ impl AccountParser {
             },
             "Starbase" => match StarbaseUI::from_bytes(data) {
                 Ok(starbase_ui) => serde_json::to_value(starbase_ui).map_err(Into::into),
+                Err(e) => Ok(error_response(e.as_ref())),
+            },
+            "Resource" => match ResourceUI::from_bytes(data) {
+                Ok(resource_ui) => serde_json::to_value(resource_ui).map_err(Into::into),
+                Err(e) => Ok(error_response(e.as_ref())),
+            },
+            "Sector" => match SectorUI::from_bytes(data) {
+                Ok(sector_ui) => serde_json::to_value(sector_ui).map_err(Into::into),
+                Err(e) => Ok(error_response(e.as_ref())),
+            },
+            "Star" => match StarUI::from_bytes(data) {
+                Ok(star_ui) => serde_json::to_value(star_ui).map_err(Into::into),
                 Err(e) => Ok(error_response(e.as_ref())),
             },
             "Game" => match GameUI::from_bytes(data) {

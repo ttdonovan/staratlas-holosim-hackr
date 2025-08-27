@@ -7,6 +7,7 @@ pub struct ShipUI {
     pub account_type: String,
     pub discriminator: String,
     pub version: u8,
+    pub game_id: String,
     pub name: String,
     pub size_class: u8,
     pub stats: ShipStatsUI,
@@ -67,6 +68,7 @@ impl TryFrom<&Ship> for ShipUI {
             account_type: "Ship".to_string(),
             discriminator: hex::encode(&ship.discriminator),
             version: ship.version,
+            game_id: ship.game_id.to_string(),
             name: std::str::from_utf8(&ship.name)?
                 .trim_matches('\0')
                 .to_string(),
