@@ -11,7 +11,7 @@ A visual galaxy map viewer for Star Atlas Holosim data using Macroquad.
   - Level, state, HP/SP
   - Upkeep resources (Ammo, Food, Toolkit)
   - Mineable resources in the sector
-- **Click-to-Pin**: Click on sectors or starbases to pin their information windows
+- **Click-to-Pin**: Click on sectors or starbases to pin their information windows at the clicked location
 - **Dynamic UI Scaling**: Modal windows scale with zoom level for better readability
 - **Grid System**: Toggle grid overlay with sector boundaries and origin marker
 - **Minimap**: Overview of the entire galaxy with current camera position

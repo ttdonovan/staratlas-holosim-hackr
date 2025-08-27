@@ -48,6 +48,41 @@ async fn main() {
         })
         .collect();
     
+    // Debug: Check sector distribution
+    eprintln!("\n=== Sector Data Analysis ===");
+    eprintln!("Total sectors loaded: {}", game_data.sectors.len());
+    
+    // Find bounds of sectors
+    let mut min_x = i64::MAX;
+    let mut max_x = i64::MIN;
+    let mut min_y = i64::MAX;
+    let mut max_y = i64::MIN;
+    
+    for sector in &game_data.sectors {
+        min_x = min_x.min(sector.coordinates.0);
+        max_x = max_x.max(sector.coordinates.0);
+        min_y = min_y.min(sector.coordinates.1);
+        max_y = max_y.max(sector.coordinates.1);
+    }
+    
+    eprintln!("Sector bounds: X[{}, {}], Y[{}, {}]", min_x, max_x, min_y, max_y);
+    
+    // Calculate expected sectors vs actual
+    let expected_sectors = ((max_x - min_x + 1) * (max_y - min_y + 1)) as usize;
+    eprintln!("Expected sectors in rectangle: {}", expected_sectors);
+    eprintln!("Actual sectors: {}", game_data.sectors.len());
+    eprintln!("Coverage: {:.1}%", (game_data.sectors.len() as f32 / expected_sectors as f32) * 100.0);
+    
+    // Check for gaps in a small area
+    eprintln!("\nChecking sector gaps around origin (-5 to 5):");
+    for y in -5..=5 {
+        for x in -5..=5 {
+            if !sector_positions.contains_key(&(x, y)) {
+                eprintln!("  Missing sector at ({}, {})", x, y);
+            }
+        }
+    }
+    
     // Create mine item lookup table (pubkey -> name)
     // We need to map from MineItem account pubkeys to names
     let mine_item_names: HashMap<String, String> = game_data.mine_items

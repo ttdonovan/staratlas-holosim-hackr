@@ -115,16 +115,20 @@ pub fn draw_starbase_modal(
         let small_font_size = 14.0 * zoom_scale;
         let line_height = 22.0 * zoom_scale;
         
-        // Position modal near mouse but ensure it stays on screen
-        let mut modal_x = mouse_pos.0 + 20.0;
-        let mut modal_y = mouse_pos.1 + 20.0;
+        // Position modal - if pinned, use stored position; if hovering, follow mouse
+        let (mut modal_x, mut modal_y) = if is_pinned && ui_state.pinned_position.is_some() {
+            let pos = ui_state.pinned_position.unwrap();
+            (pos.0 + 20.0, pos.1 + 20.0)
+        } else {
+            (mouse_pos.0 + 20.0, mouse_pos.1 + 20.0)
+        };
         
         // Keep modal on screen
         if modal_x + modal_width > screen_width() {
-            modal_x = mouse_pos.0 - modal_width - 20.0;
+            modal_x = modal_x.max(20.0) - modal_width - 40.0;
         }
         if modal_y + modal_height > screen_height() {
-            modal_y = mouse_pos.1 - modal_height - 20.0;
+            modal_y = modal_y.max(20.0) - modal_height - 40.0;
         }
         
         // Draw modal background
@@ -152,14 +156,6 @@ pub fn draw_starbase_modal(
         
         // Title
         draw_text(&starbase.name, modal_x + 10.0, modal_y + 25.0 * zoom_scale, title_font_size, WHITE);
-        
-        // Pin indicator
-        if is_pinned {
-            draw_text("📍", modal_x + modal_width - 40.0 * zoom_scale, modal_y + 25.0 * zoom_scale, title_font_size, Color::from_rgba(255, 255, 150, 255));
-        }
-        
-        // Close button hint
-        draw_text("ESC to close", modal_x + modal_width - 90.0 * zoom_scale, modal_y + modal_height - 20.0 * zoom_scale, small_font_size * 0.8, Color::from_rgba(150, 150, 150, 200));
         
         let mut y_offset = modal_y + 60.0 * zoom_scale;
         
@@ -295,7 +291,10 @@ pub fn draw_starbase_modal(
             }
         }
         
-        // Sequence ID (bottom)
+        // Sequence ID and close instruction (bottom)
         draw_text(&format!("ID: {}", starbase.seq_id), modal_x + 10.0, modal_y + modal_height - 25.0 * zoom_scale, small_font_size, Color::from_rgba(150, 150, 150, 255));
+        if is_pinned {
+            draw_text("Press ESC to close", modal_x + modal_width - 150.0 * zoom_scale, modal_y + modal_height - 25.0 * zoom_scale, small_font_size, Color::from_rgba(150, 150, 150, 255));
+        }
     }
 }

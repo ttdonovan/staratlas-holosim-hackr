@@ -14,6 +14,7 @@ pub struct UIState {
     pub mouse_world_pos: Vector2<f32>,
     pub hovered_starbase: Option<StarbaseUI>,
     pub pinned_item: Option<PinnedItem>,
+    pub pinned_position: Option<(f32, f32)>,
 }
 
 impl UIState {
@@ -25,6 +26,7 @@ impl UIState {
             mouse_world_pos: Vector2::new(0.0, 0.0),
             hovered_starbase: None,
             pinned_item: None,
+            pinned_position: None,
         }
     }
 }
