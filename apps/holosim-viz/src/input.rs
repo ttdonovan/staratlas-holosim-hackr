@@ -34,6 +34,9 @@ pub fn handle_input(camera: &mut Camera2D, ui_state: &mut UIState) {
     if is_key_pressed(KeyCode::F2) {
         ui_state.show_search = !ui_state.show_search;
     }
+    if is_key_pressed(KeyCode::G) {
+        ui_state.show_grid = !ui_state.show_grid;
+    }
     
     // Mouse hover detection
     let mouse_pos = mouse_position();

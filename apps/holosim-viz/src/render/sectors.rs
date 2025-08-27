@@ -41,14 +41,14 @@ pub fn draw_sectors(
             
             // Check if mouse is hovering over this sector
             let dist_sq = (ui_state.mouse_world_pos - pos).magnitude_squared();
-            if dist_sq < 100.0 {
-                // Draw sector info
+            if dist_sq < 100.0 && ui_state.hovered_starbase.is_none() {
+                // Only show sector label when NOT hovering over a starbase
                 draw_text(
                     &format!("{} ({}, {})", sector.name, sector.coordinates.0, sector.coordinates.1),
                     screen_pos.x + 10.0,
                     screen_pos.y - 10.0,
                     16.0,
-                    WHITE,
+                    Color::from_rgba(200, 200, 200, 200),
                 );
             }
         }

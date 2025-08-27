@@ -21,6 +21,7 @@ A visual galaxy map viewer for Star Atlas Holosim data using Macroquad.
 - **Zoom**: Mouse wheel
 - **Toggle Info Panel**: F1
 - **Toggle Search**: F2 (coming soon)
+- **Toggle Grid**: G (shows sector grid lines)
 
 ## Project Structure
 

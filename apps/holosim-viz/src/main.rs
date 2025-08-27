@@ -12,7 +12,7 @@ use data::GameData;
 use camera::Camera2D;
 use ui::UIState;
 use input::handle_input;
-use render::{draw_sectors, draw_starbases, draw_ui, draw_minimap, draw_starbase_modal};
+use render::{draw_sectors, draw_starbases, draw_ui, draw_minimap, draw_starbase_modal, draw_grid};
 
 #[macroquad::main("Star Atlas Galaxy Map")]
 async fn main() {
@@ -94,6 +94,11 @@ async fn main() {
         
         // Apply camera transform
         let cam_matrix = camera.matrix();
+        
+        // Draw grid if enabled
+        if ui_state.show_grid {
+            draw_grid(&cam_matrix, &camera);
+        }
         
         // Draw sectors
         draw_sectors(&game_data, &sector_positions, &cam_matrix, &ui_state);
