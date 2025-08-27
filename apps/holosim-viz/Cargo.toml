@@ -1,0 +1,30 @@
+[package]
+name = "holosim-viz"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Game engine
+macroquad = "0.4"
+
+# Data handling
+ron = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# UI
+egui = "0.23"
+egui-macroquad = "0.17"
+
+# Error handling
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Import UI types
+ui-holosim = { path = "../../crates/ui-holosim" }
+
+# Math utilities
+nalgebra = "0.33"

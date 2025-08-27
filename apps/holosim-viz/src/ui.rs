@@ -1,0 +1,17 @@
+use nalgebra::Vector2;
+
+pub struct UIState {
+    pub show_info_panel: bool,
+    pub show_search: bool,
+    pub mouse_world_pos: Vector2<f32>,
+}
+
+impl UIState {
+    pub fn new() -> Self {
+        Self {
+            show_info_panel: true,
+            show_search: false,
+            mouse_world_pos: Vector2::new(0.0, 0.0),
+        }
+    }
+}
