@@ -101,7 +101,7 @@ async fn main() {
         draw_ui(&game_data, &ui_state, &camera);
         
         // Draw starbase modal if hovering
-        draw_starbase_modal(&ui_state, &game_data, &mine_item_names, &resource_locations);
+        draw_starbase_modal(&ui_state, &game_data, &mine_item_names, &resource_locations, &camera);
         
         // Draw minimap
         draw_minimap(&sector_positions, &camera);
@@ -322,12 +322,22 @@ fn draw_starbase_modal(
     ui_state: &UIState, 
     game_data: &GameData, 
     mine_item_names: &HashMap<String, String>,
-    resource_locations: &HashMap<String, Vec<String>>
+    resource_locations: &HashMap<String, Vec<String>>,
+    camera: &Camera2D
 ) {
     if let Some(starbase) = &ui_state.hovered_starbase {
         let mouse_pos = mouse_position();
-        let modal_width = 320.0;
-        let modal_height = 500.0;
+        
+        // Scale modal size based on zoom level
+        // When zoomed in (zoom > 1), make modal larger
+        // When zoomed out (zoom < 1), use default size
+        let zoom_scale = camera.zoom.max(1.0).min(3.0); // Cap at 3x size
+        let modal_width = 320.0 * zoom_scale;
+        let modal_height = 500.0 * zoom_scale;
+        let base_font_size = 16.0 * zoom_scale;
+        let title_font_size = 22.0 * zoom_scale;
+        let small_font_size = 14.0 * zoom_scale;
+        let line_height = 22.0 * zoom_scale;
         
         // Position modal near mouse but ensure it stays on screen
         let mut modal_x = mouse_pos.0 + 20.0;
@@ -357,7 +367,7 @@ fn draw_starbase_modal(
         };
         
         // Draw header with faction color
-        draw_rectangle(modal_x, modal_y, modal_width, 40.0, Color::from_rgba(
+        draw_rectangle(modal_x, modal_y, modal_width, 40.0 * zoom_scale, Color::from_rgba(
             (faction_color.r * 255.0 * 0.3) as u8,
             (faction_color.g * 255.0 * 0.3) as u8,
             (faction_color.b * 255.0 * 0.3) as u8,
@@ -365,24 +375,23 @@ fn draw_starbase_modal(
         ));
         
         // Title
-        draw_text(&starbase.name, modal_x + 10.0, modal_y + 25.0, 22.0, WHITE);
+        draw_text(&starbase.name, modal_x + 10.0, modal_y + 25.0 * zoom_scale, title_font_size, WHITE);
         
-        let mut y_offset = modal_y + 60.0;
-        let line_height = 22.0;
+        let mut y_offset = modal_y + 60.0 * zoom_scale;
         
         // Faction
-        draw_text("Faction:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(faction_name, modal_x + 100.0, y_offset, 16.0, faction_color);
+        draw_text("Faction:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(faction_name, modal_x + 100.0 * zoom_scale, y_offset, base_font_size, faction_color);
         y_offset += line_height;
         
         // Sector coordinates
-        draw_text("Sector:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(&format!("({}, {})", starbase.sector.0, starbase.sector.1), modal_x + 100.0, y_offset, 16.0, WHITE);
+        draw_text("Sector:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(&format!("({}, {})", starbase.sector.0, starbase.sector.1), modal_x + 100.0 * zoom_scale, y_offset, base_font_size, WHITE);
         y_offset += line_height;
         
         // Level
-        draw_text("Level:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(&format!("{}", starbase.level), modal_x + 100.0, y_offset, 16.0, WHITE);
+        draw_text("Level:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(&format!("{}", starbase.level), modal_x + 100.0 * zoom_scale, y_offset, base_font_size, WHITE);
         y_offset += line_height;
         
         // State
@@ -392,43 +401,43 @@ fn draw_starbase_modal(
             2 => "Upgrading",
             _ => "Unknown",
         };
-        draw_text("State:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(state_text, modal_x + 100.0, y_offset, 16.0, WHITE);
+        draw_text("State:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(state_text, modal_x + 100.0 * zoom_scale, y_offset, base_font_size, WHITE);
         y_offset += line_height;
         
         // HP/SP
-        draw_text("HP/SP:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(&format!("{}/{}", starbase.hp, starbase.sp), modal_x + 100.0, y_offset, 16.0, WHITE);
+        draw_text("HP/SP:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(&format!("{}/{}", starbase.hp, starbase.sp), modal_x + 100.0 * zoom_scale, y_offset, base_font_size, WHITE);
         y_offset += line_height;
         
         // Draw separator
-        y_offset += 10.0;
-        draw_line(modal_x + 10.0, y_offset, modal_x + modal_width - 10.0, y_offset, 1.0, Color::from_rgba(100, 100, 100, 100));
-        y_offset += 15.0;
+        y_offset += 10.0 * zoom_scale;
+        draw_line(modal_x + 10.0, y_offset, modal_x + modal_width - 10.0, y_offset, 1.0 * zoom_scale, Color::from_rgba(100, 100, 100, 100));
+        y_offset += 15.0 * zoom_scale;
         
         // Upkeep Resources
-        draw_text("Upkeep Resources", modal_x + 10.0, y_offset, 18.0, WHITE);
+        draw_text("Upkeep Resources", modal_x + 10.0, y_offset, base_font_size * 1.125, WHITE);
         y_offset += line_height;
         
         // Ammo
-        draw_text("Ammo:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(&format!("{}", starbase.upkeep_ammo_balance), modal_x + 100.0, y_offset, 16.0, WHITE);
+        draw_text("Ammo:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(&format!("{}", starbase.upkeep_ammo_balance), modal_x + 100.0 * zoom_scale, y_offset, base_font_size, WHITE);
         y_offset += line_height;
         
         // Food
-        draw_text("Food:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(&format!("{}", starbase.upkeep_food_balance), modal_x + 100.0, y_offset, 16.0, WHITE);
+        draw_text("Food:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(&format!("{}", starbase.upkeep_food_balance), modal_x + 100.0 * zoom_scale, y_offset, base_font_size, WHITE);
         y_offset += line_height;
         
         // Toolkit
-        draw_text("Toolkit:", modal_x + 10.0, y_offset, 16.0, GRAY);
-        draw_text(&format!("{}", starbase.upkeep_toolkit_balance), modal_x + 100.0, y_offset, 16.0, WHITE);
+        draw_text("Toolkit:", modal_x + 10.0, y_offset, base_font_size, GRAY);
+        draw_text(&format!("{}", starbase.upkeep_toolkit_balance), modal_x + 100.0 * zoom_scale, y_offset, base_font_size, WHITE);
         y_offset += line_height;
         
         // Draw separator
-        y_offset += 10.0;
-        draw_line(modal_x + 10.0, y_offset, modal_x + modal_width - 10.0, y_offset, 1.0, Color::from_rgba(100, 100, 100, 100));
-        y_offset += 15.0;
+        y_offset += 10.0 * zoom_scale;
+        draw_line(modal_x + 10.0, y_offset, modal_x + modal_width - 10.0, y_offset, 1.0 * zoom_scale, Color::from_rgba(100, 100, 100, 100));
+        y_offset += 15.0 * zoom_scale;
         
         // Find planets in the same sector
         let sector_planets: Vec<&ui_holosim::PlanetUI> = game_data.planets.iter()
@@ -436,15 +445,15 @@ fn draw_starbase_modal(
             .collect();
         
         // Show sector resources
-        draw_text("Sector Info", modal_x + 10.0, y_offset, 18.0, WHITE);
+        draw_text("Sector Info", modal_x + 10.0, y_offset, base_font_size * 1.125, WHITE);
         y_offset += line_height;
         
         if sector_planets.is_empty() {
-            draw_text("No planets in sector", modal_x + 10.0, y_offset, 14.0, Color::from_rgba(150, 150, 150, 255));
+            draw_text("No planets in sector", modal_x + 10.0, y_offset, small_font_size, Color::from_rgba(150, 150, 150, 255));
         } else {
             let total_resources: u8 = sector_planets.iter().map(|p| p.num_resources).sum();
-            draw_text(&format!("Planets: {}", sector_planets.len()), modal_x + 10.0, y_offset, 16.0, GRAY);
-            draw_text(&format!("Resources: {}", total_resources), modal_x + 150.0, y_offset, 16.0, WHITE);
+            draw_text(&format!("Planets: {}", sector_planets.len()), modal_x + 10.0, y_offset, base_font_size, GRAY);
+            draw_text(&format!("Resources: {}", total_resources), modal_x + 150.0 * zoom_scale, y_offset, base_font_size, WHITE);
             y_offset += line_height;
             
             // Find mineable resources in this sector
@@ -487,22 +496,22 @@ fn draw_starbase_modal(
             eprintln!("Mine item names map size: {}", mine_item_names.len());
             
             if !sector_resources.is_empty() {
-                draw_text("Mineable Resources:", modal_x + 10.0, y_offset, 14.0, GRAY);
-                y_offset += 18.0;
+                draw_text("Mineable Resources:", modal_x + 10.0, y_offset, small_font_size, GRAY);
+                y_offset += 18.0 * zoom_scale;
                 
                 sector_resources.sort();
                 for (i, name) in sector_resources.iter().take(5).enumerate() {
-                    draw_text(&format!("• {}", name), modal_x + 20.0, y_offset + (i as f32 * 16.0), 12.0, Color::from_rgba(100, 255, 100, 255));
+                    draw_text(&format!("• {}", name), modal_x + 20.0 * zoom_scale, y_offset + (i as f32 * base_font_size), small_font_size * 0.857, Color::from_rgba(100, 255, 100, 255));
                 }
                 if sector_resources.len() > 5 {
-                    draw_text(&format!("... and {} more", sector_resources.len() - 5), modal_x + 20.0, y_offset + 80.0, 12.0, Color::from_rgba(150, 150, 150, 255));
+                    draw_text(&format!("... and {} more", sector_resources.len() - 5), modal_x + 20.0 * zoom_scale, y_offset + 80.0 * zoom_scale, small_font_size * 0.857, Color::from_rgba(150, 150, 150, 255));
                 }
             } else if total_resources > 0 {
-                draw_text("Resources not yet mapped", modal_x + 10.0, y_offset, 14.0, Color::from_rgba(150, 150, 150, 255));
+                draw_text("Resources not yet mapped", modal_x + 10.0, y_offset, small_font_size, Color::from_rgba(150, 150, 150, 255));
             }
         }
         
         // Sequence ID (bottom)
-        draw_text(&format!("ID: {}", starbase.seq_id), modal_x + 10.0, modal_y + modal_height - 25.0, 14.0, Color::from_rgba(150, 150, 150, 255));
+        draw_text(&format!("ID: {}", starbase.seq_id), modal_x + 10.0, modal_y + modal_height - 25.0 * zoom_scale, small_font_size, Color::from_rgba(150, 150, 150, 255));
     }
 }
