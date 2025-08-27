@@ -1,124 +1,65 @@
-# Create a Codama IDL
+# List all available commands
+default:
+    @just --list
+
+# Codama Generation
 codama-create-idl:
     bun run scripts/createCodamaIDL.ts
 
-# Generate (render) Rust client code
 codama-generate-rs:
     bun run scripts/generateCode.ts
 
-# Build Holosim's documentation
-doc-holosim:
-    cargo doc -p staratlas-holosim --no-deps --open
+# Documentation
+doc:
+    cargo doc --no-deps --open
 
-# hackr-ixproc commands
-# Run hackr-ixproc in lite mode (no database)
-hackr-ix-run:
+# hackr-ixproc (Instruction Processor)
+ix-run:
     cargo run -p hackr-ixproc
 
-# Run hackr-ixproc with database support
-hackr-ix-run-db:
-    cargo run -p hackr-ixproc --features database -- --database
-
-# Run hackr-ixproc with database and dump existing accounts on startup
-hackr-ix-run-db-dump:
+ix-run-db:
     cargo run -p hackr-ixproc --features database -- --database --dump-accounts
 
-# Run hackr-ixproc with custom database file and account dumping
-hackr-ix-run-db-custom DB_FILE:
-    cargo run -p hackr-ixproc --features database -- --database --database-url {{DB_FILE}} --dump-accounts
-
-# Check hackr-ixproc compilation (lite mode)
-hackr-ix-check:
-    cargo check -p hackr-ixproc
-
-# Check hackr-ixproc compilation with database features
-hackr-ix-check-db:
-    cargo check -p hackr-ixproc --features database
-
-# Build hackr-ixproc release binary with database support
-hackr-ix-build-release:
+ix-build:
     cargo build -p hackr-ixproc --features database --release
 
-# Show hackr-ixproc help
-hackr-ix-help:
-    cargo run -p hackr-ixproc --features database -- --help
-
-# Clean up generated database files
-hackr-clean-db:
-    rm -f hackr.db hackr.db-shm hackr.db-wal
-
-# hackr-saproc commands
-# Show database statistics for stored accounts
-hackr-sa-stats:
-    cargo run -p hackr-saproc -- --stats-only
-
-# Process all accounts in the database
-hackr-sa-run:
+# hackr-saproc (Star Atlas Processor)  
+sa-run:
     cargo run -p hackr-saproc
 
-# Process accounts for a specific program
-hackr-sa-run-program PROGRAM_ID:
-    cargo run -p hackr-saproc -- --program-id {{PROGRAM_ID}}
-
-# Process accounts with JSON output
-hackr-sa-run-json:
-    cargo run -p hackr-saproc -- --output json
-
-# Process accounts with detailed output
-hackr-sa-run-detailed:
-    cargo run -p hackr-saproc -- --output detailed
-
-# Process limited number of accounts (for testing)
-hackr-sa-run-limit COUNT:
-    cargo run -p hackr-saproc -- --limit {{COUNT}} --output detailed
-
-# Process Holosim accounts only
-hackr-sa-holosim:
-    cargo run -p hackr-saproc -- --program-id SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF
-
-# Process Player Profile accounts only
-hackr-sa-player-profile:
-    cargo run -p hackr-saproc -- --program-id PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ
-
-# Process Profile Faction accounts only
-hackr-sa-profile-faction:
-    cargo run -p hackr-saproc -- --program-id pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj
-
-# Check hackr-saproc compilation
-hackr-sa-check:
-    cargo check -p hackr-saproc
-
-# Build hackr-saproc release binary
-hackr-sa-build-release:
-    cargo build -p hackr-saproc --release
-
-# Show hackr-saproc help
-hackr-sa-help:
-    cargo run -p hackr-saproc -- --help
-
-# Process accounts with write mode (save parsed data)
-hackr-sa-run-write:
+sa-run-write:
     cargo run -p hackr-saproc -- --write
 
-# Process specific program with write mode
-hackr-sa-run-write-program PROGRAM_ID:
-    cargo run -p hackr-saproc -- --program-id {{PROGRAM_ID}} --write
+sa-stats:
+    cargo run -p hackr-saproc -- --stats-only
 
-# Process Holosim accounts with write mode
-hackr-sa-holosim-write:
-    cargo run -p hackr-saproc -- --program-id SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF --write
+sa-build:
+    cargo build -p hackr-saproc --release
 
-# Process limited accounts with write mode (for testing)
-hackr-sa-run-write-limit COUNT:
-    cargo run -p hackr-saproc -- --limit {{COUNT}} --write --output detailed
+# Database Management
+db-schema:
+    sqlite3 hackr.db ".schema"
 
-# Database documentation commands
-# Export database schema to docs folder
 db-schema-export:
     @echo "Exporting database schema..."
     @sqlite3 hackr.db ".schema" > docs/database-schema.sql
     @echo "Schema exported to docs/database-schema.sql"
 
-# Show database schema in terminal
-db-schema-show:
-    sqlite3 hackr.db ".schema"
+clean-db:
+    rm -f hackr.db hackr.db-shm hackr.db-wal
+
+# General Commands
+check:
+    cargo check --workspace
+
+build:
+    cargo build --workspace --release
+
+test:
+    cargo test --workspace
+
+fmt:
+    cargo fmt --all
+
+clippy:
+    cargo clippy --all-targets --all-features -- -D warnings
