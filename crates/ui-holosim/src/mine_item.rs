@@ -13,6 +13,7 @@ pub struct MineItemUI {
     pub resource_hardness: u16,
     pub num_resource_accounts: u64,
     pub bump: u8,
+    pub pubkey: Option<String>,
 }
 
 impl TryFrom<&MineItem> for MineItemUI {
@@ -31,6 +32,7 @@ impl TryFrom<&MineItem> for MineItemUI {
             resource_hardness: mine_item.resource_hardness,
             num_resource_accounts: mine_item.num_resource_accounts,
             bump: mine_item.bump,
+            pubkey: None,
         })
     }
 }

@@ -19,6 +19,7 @@ pub struct PlanetUI {
     pub amount_mined: u64,
     pub num_resources: u8,
     pub num_miners: u64,
+    pub pubkey: Option<String>,
 }
 
 impl TryFrom<&Planet> for PlanetUI {
@@ -43,6 +44,7 @@ impl TryFrom<&Planet> for PlanetUI {
             amount_mined: planet.amount_mined,
             num_resources: planet.num_resources,
             num_miners: planet.num_miners,
+            pubkey: None,
         })
     }
 }

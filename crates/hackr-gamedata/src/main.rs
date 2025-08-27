@@ -137,15 +137,18 @@ async fn main() -> Result<()> {
 
         let planets: Vec<PlanetUI> = planet_accounts
             .into_iter()
-            .filter_map(
-                |account| match serde_json::from_value::<PlanetUI>(account.parsed_data) {
-                    Ok(planet) => Some(planet),
+            .filter_map(|account| {
+                match serde_json::from_value::<PlanetUI>(account.parsed_data) {
+                    Ok(mut planet) => {
+                        planet.pubkey = Some(account.account_pubkey);
+                        Some(planet)
+                    }
                     Err(e) => {
                         warn!("Failed to parse Planet account: {}", e);
                         None
                     }
-                },
-            )
+                }
+            })
             .collect();
 
         info!("  Found {} Planet(s)", planets.len());
@@ -163,15 +166,18 @@ async fn main() -> Result<()> {
 
         let mine_items: Vec<MineItemUI> = mine_item_accounts
             .into_iter()
-            .filter_map(
-                |account| match serde_json::from_value::<MineItemUI>(account.parsed_data) {
-                    Ok(mine_item) => Some(mine_item),
+            .filter_map(|account| {
+                match serde_json::from_value::<MineItemUI>(account.parsed_data) {
+                    Ok(mut mine_item) => {
+                        mine_item.pubkey = Some(account.account_pubkey);
+                        Some(mine_item)
+                    }
                     Err(e) => {
                         warn!("Failed to parse MineItem account: {}", e);
                         None
                     }
-                },
-            )
+                }
+            })
             .collect();
 
         info!("  Found {} MineItem(s)", mine_items.len());
