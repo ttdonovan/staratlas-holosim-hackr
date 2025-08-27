@@ -78,7 +78,16 @@ hackr-saproc --limit 10 --output detailed
 
 Use a different database file:
 ```bash
+# Via command line
 hackr-saproc --database-url /path/to/custom.db
+
+# Via environment variable
+export DATABASE_URL=/path/to/custom.db
+hackr-saproc
+
+# Or use .env file
+echo "DATABASE_URL=/path/to/custom.db" > .env
+hackr-saproc
 ```
 
 ## Command Line Options
@@ -88,7 +97,8 @@ hackr-saproc [OPTIONS]
 
 Options:
       --database-url <DATABASE_URL>
-          Database URL (SQLite file path from hackr-ixproc) [default: hackr.db]
+          Database URL (SQLite file path from hackr-ixproc)
+          Falls back to DATABASE_URL env var, then defaults to hackr.db
 
       --program-id <PROGRAM_ID>
           Program ID to filter accounts (optional, processes all if not specified)

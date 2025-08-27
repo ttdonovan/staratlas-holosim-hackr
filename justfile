@@ -44,7 +44,7 @@ hackr-ix-help:
     cargo run -p hackr-ixproc --features database -- --help
 
 # Clean up generated database files
-hackr-ix-clean-db:
+hackr-clean-db:
     rm -f hackr.db hackr.db-shm hackr.db-wal
 
 # hackr-saproc commands

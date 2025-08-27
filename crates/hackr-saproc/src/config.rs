@@ -11,8 +11,8 @@ pub struct EnvConfig {
 #[command(about = "Star Atlas Solana account processor - parses stored account data")]
 pub struct Args {
     /// Database URL (SQLite file path from hackr-ixproc)
-    #[arg(long, default_value = "hackr.db")]
-    pub database_url: String,
+    #[arg(long)]
+    pub database_url: Option<String>,
 
     /// Program ID to filter accounts (optional, processes all if not specified)
     #[arg(long)]
@@ -48,10 +48,15 @@ pub struct Config {
 impl Config {
     pub fn from_env_and_args() -> anyhow::Result<Self> {
         dotenv::dotenv().ok();
-        let _env_config = envy::from_env::<EnvConfig>().unwrap_or(EnvConfig { database_url: None });
+        let env_config = envy::from_env::<EnvConfig>().unwrap_or(EnvConfig { database_url: None });
         let args = Args::parse();
 
-        let database_url = args.database_url.clone();
+        // Use CLI argument if provided, otherwise fall back to env var, then to default
+        let database_url = args
+            .database_url
+            .clone()
+            .or(env_config.database_url)
+            .unwrap_or_else(|| "hackr.db".to_string());
 
         Ok(Config { database_url, args })
     }
