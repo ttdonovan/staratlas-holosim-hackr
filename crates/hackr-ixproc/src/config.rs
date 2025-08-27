@@ -1,7 +1,7 @@
 use clap::Parser;
 use serde::Deserialize;
-use std::str::FromStr;
 use solana_sdk::pubkey::Pubkey;
+use std::str::FromStr;
 
 #[derive(Debug, Deserialize)]
 pub struct EnvConfig {
@@ -46,13 +46,13 @@ impl Config {
         dotenv::dotenv().ok();
         let env_config = envy::from_env::<EnvConfig>()?;
         let args = Args::parse();
-        
+
         let database_url = if args.database {
             Some(args.database_url.clone())
         } else {
             env_config.database_url
         };
-        
+
         Ok(Config {
             rpc_url: env_config.rpc_url,
             rpc_ws_url: env_config.rpc_ws_url,

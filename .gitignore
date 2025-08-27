@@ -1,5 +1,7 @@
 .env
-*.db*
+*.db
+*.db-shm
+*.db-wal
 node_modules
 target
 vault

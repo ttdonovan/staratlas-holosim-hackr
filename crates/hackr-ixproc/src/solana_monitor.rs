@@ -1,7 +1,7 @@
 use anyhow::Result;
 use solana_client::{
-    rpc_client::RpcClient, 
-    rpc_config::{RpcTransactionLogsConfig, RpcTransactionLogsFilter, RpcProgramAccountsConfig},
+    rpc_client::RpcClient,
+    rpc_config::{RpcProgramAccountsConfig, RpcTransactionLogsConfig, RpcTransactionLogsFilter},
 };
 use solana_pubsub_client::nonblocking::pubsub_client::PubsubClient;
 use solana_sdk::{commitment_config::CommitmentConfig, pubkey::Pubkey};
@@ -13,8 +13,14 @@ use crate::processor::LiteProcessor;
 
 #[derive(Debug)]
 pub enum SubscriptionEvent {
-    LogsUpdate(Pubkey, solana_client::rpc_response::Response<solana_client::rpc_response::RpcLogsResponse>),
-    AccountUpdate(Pubkey, solana_client::rpc_response::Response<solana_client::rpc_response::RpcKeyedAccount>),
+    LogsUpdate(
+        Pubkey,
+        solana_client::rpc_response::Response<solana_client::rpc_response::RpcLogsResponse>,
+    ),
+    AccountUpdate(
+        Pubkey,
+        solana_client::rpc_response::Response<solana_client::rpc_response::RpcKeyedAccount>,
+    ),
 }
 
 pub struct SolanaMonitor {
@@ -26,7 +32,7 @@ pub struct SolanaMonitor {
 impl SolanaMonitor {
     pub fn new(rpc_url: String, ws_url: String, programs: Vec<Pubkey>) -> Self {
         let rpc_client = RpcClient::new(rpc_url);
-        
+
         Self {
             rpc_client,
             ws_url,
@@ -35,14 +41,17 @@ impl SolanaMonitor {
     }
 
     pub async fn start_monitoring(&self, mut processor: LiteProcessor) -> Result<()> {
-        info!("🚀 Starting Solana monitor for {} programs", self.programs.len());
+        info!(
+            "🚀 Starting Solana monitor for {} programs",
+            self.programs.len()
+        );
         for program in &self.programs {
             info!("📡 Monitoring program: {}", program);
         }
 
         // Create a channel for receiving subscription events
         let (tx, mut rx) = mpsc::unbounded_channel();
-        
+
         // Spawn subscription tasks for each program (both logs and accounts)
         for program_id in &self.programs {
             let ws_url_logs = self.ws_url.clone();
@@ -50,25 +59,31 @@ impl SolanaMonitor {
             let program_id_clone = *program_id;
             let tx_logs = tx.clone();
             let tx_accounts = tx.clone();
-            
+
             info!("📋 Starting subscription tasks for program: {}", program_id);
-            
+
             // Spawn task for log subscriptions
             tokio::spawn(async move {
                 use futures_util::StreamExt;
-                
-                info!("🔌 Connecting to Solana pubsub for LOGS: {}", program_id_clone);
+
+                info!(
+                    "🔌 Connecting to Solana pubsub for LOGS: {}",
+                    program_id_clone
+                );
                 let pubsub_client = match PubsubClient::new(&ws_url_logs).await {
                     Ok(client) => {
                         info!("✅ Solana pubsub connected for logs: {}", program_id_clone);
                         client
                     }
                     Err(e) => {
-                        error!("❌ Failed to connect pubsub for logs {}: {}", program_id_clone, e);
+                        error!(
+                            "❌ Failed to connect pubsub for logs {}: {}",
+                            program_id_clone, e
+                        );
                         return;
                     }
                 };
-                
+
                 let (mut logs_stream, logs_unsubscribe) = match pubsub_client
                     .logs_subscribe(
                         RpcTransactionLogsFilter::Mentions(vec![program_id_clone.to_string()]),
@@ -76,53 +91,71 @@ impl SolanaMonitor {
                             commitment: Some(CommitmentConfig::confirmed()),
                         },
                     )
-                    .await 
+                    .await
                 {
                     Ok(subscription) => {
                         info!("✅ Subscribed to LOGS for program: {}", program_id_clone);
                         subscription
                     }
                     Err(e) => {
-                        error!("❌ Failed to subscribe to logs for program {}: {}", program_id_clone, e);
+                        error!(
+                            "❌ Failed to subscribe to logs for program {}: {}",
+                            program_id_clone, e
+                        );
                         return;
                     }
                 };
-                
+
                 while let Some(logs_response) = logs_stream.next().await {
                     debug!(
                         program_id = %program_id_clone,
                         signature = %logs_response.value.signature,
                         "📨 Received log notification"
                     );
-                    
-                    if let Err(e) = tx_logs.send(SubscriptionEvent::LogsUpdate(program_id_clone, logs_response)) {
+
+                    if let Err(e) = tx_logs.send(SubscriptionEvent::LogsUpdate(
+                        program_id_clone,
+                        logs_response,
+                    )) {
                         error!("Failed to send log notification: {}", e);
                         break;
                     }
                 }
-                
+
                 // Clean up subscription when done
                 let _ = logs_unsubscribe().await;
-                info!("🛑 Log subscription ended for program: {}", program_id_clone);
+                info!(
+                    "🛑 Log subscription ended for program: {}",
+                    program_id_clone
+                );
             });
-            
+
             // Spawn task for account subscriptions
             let program_id_accounts = program_id_clone;
             tokio::spawn(async move {
                 use futures_util::StreamExt;
-                
-                info!("🔌 Connecting to Solana pubsub for ACCOUNTS: {}", program_id_accounts);
+
+                info!(
+                    "🔌 Connecting to Solana pubsub for ACCOUNTS: {}",
+                    program_id_accounts
+                );
                 let pubsub_client = match PubsubClient::new(&ws_url_accounts).await {
                     Ok(client) => {
-                        info!("✅ Solana pubsub connected for accounts: {}", program_id_accounts);
+                        info!(
+                            "✅ Solana pubsub connected for accounts: {}",
+                            program_id_accounts
+                        );
                         client
                     }
                     Err(e) => {
-                        error!("❌ Failed to connect pubsub for accounts {}: {}", program_id_accounts, e);
+                        error!(
+                            "❌ Failed to connect pubsub for accounts {}: {}",
+                            program_id_accounts, e
+                        );
                         return;
                     }
                 };
-                
+
                 let (mut accounts_stream, accounts_unsubscribe) = match pubsub_client
                     .program_subscribe(
                         &program_id_accounts,
@@ -138,34 +171,46 @@ impl SolanaMonitor {
                             sort_results: None,
                         }),
                     )
-                    .await 
+                    .await
                 {
                     Ok(subscription) => {
-                        info!("✅ Subscribed to ACCOUNTS for program: {}", program_id_accounts);
+                        info!(
+                            "✅ Subscribed to ACCOUNTS for program: {}",
+                            program_id_accounts
+                        );
                         subscription
                     }
                     Err(e) => {
-                        error!("❌ Failed to subscribe to accounts for program {}: {}", program_id_accounts, e);
+                        error!(
+                            "❌ Failed to subscribe to accounts for program {}: {}",
+                            program_id_accounts, e
+                        );
                         return;
                     }
                 };
-                
+
                 while let Some(account_response) = accounts_stream.next().await {
                     debug!(
                         program_id = %program_id_accounts,
                         account_pubkey = %account_response.value.pubkey,
                         "💰 Received account update notification"
                     );
-                    
-                    if let Err(e) = tx_accounts.send(SubscriptionEvent::AccountUpdate(program_id_accounts, account_response)) {
+
+                    if let Err(e) = tx_accounts.send(SubscriptionEvent::AccountUpdate(
+                        program_id_accounts,
+                        account_response,
+                    )) {
                         error!("Failed to send account notification: {}", e);
                         break;
                     }
                 }
-                
+
                 // Clean up subscription when done
                 let _ = accounts_unsubscribe().await;
-                info!("🛑 Account subscription ended for program: {}", program_id_accounts);
+                info!(
+                    "🛑 Account subscription ended for program: {}",
+                    program_id_accounts
+                );
             });
         }
 
@@ -175,12 +220,22 @@ impl SolanaMonitor {
         while let Some(event) = rx.recv().await {
             match event {
                 SubscriptionEvent::LogsUpdate(program_id, logs_notification) => {
-                    if let Err(e) = self.handle_logs_notification(program_id, logs_notification, &mut processor).await {
+                    if let Err(e) = self
+                        .handle_logs_notification(program_id, logs_notification, &mut processor)
+                        .await
+                    {
                         error!("Error handling logs notification: {}", e);
                     }
                 }
                 SubscriptionEvent::AccountUpdate(program_id, account_notification) => {
-                    if let Err(e) = self.handle_account_notification(program_id, account_notification, &mut processor).await {
+                    if let Err(e) = self
+                        .handle_account_notification(
+                            program_id,
+                            account_notification,
+                            &mut processor,
+                        )
+                        .await
+                    {
                         error!("Error handling account notification: {}", e);
                     }
                 }
@@ -195,7 +250,9 @@ impl SolanaMonitor {
     async fn handle_logs_notification(
         &self,
         program_id: Pubkey,
-        logs_notification: solana_client::rpc_response::Response<solana_client::rpc_response::RpcLogsResponse>,
+        logs_notification: solana_client::rpc_response::Response<
+            solana_client::rpc_response::RpcLogsResponse,
+        >,
         processor: &mut LiteProcessor,
     ) -> Result<()> {
         let signature = &logs_notification.value.signature;
@@ -223,14 +280,14 @@ impl SolanaMonitor {
         match self.fetch_transaction(signature).await {
             Ok(Some(transaction)) => {
                 let slot = transaction.slot;
-                
+
                 info!(
                     signature = %signature,
                     slot = slot,
                     program_id = %program_id,
                     "✅ Successfully fetched transaction - processing..."
                 );
-                
+
                 if let Err(e) = processor.process_transaction(signature, slot, &transaction) {
                     error!("❌ Error processing transaction: {}", e);
                 } else {
@@ -251,7 +308,9 @@ impl SolanaMonitor {
     async fn handle_account_notification(
         &self,
         program_id: Pubkey,
-        account_notification: solana_client::rpc_response::Response<solana_client::rpc_response::RpcKeyedAccount>,
+        account_notification: solana_client::rpc_response::Response<
+            solana_client::rpc_response::RpcKeyedAccount,
+        >,
         processor: &mut LiteProcessor,
     ) -> Result<()> {
         let account_pubkey = &account_notification.value.pubkey;
@@ -287,7 +346,7 @@ impl SolanaMonitor {
         signature: &str,
     ) -> Result<Option<EncodedConfirmedTransactionWithStatusMeta>> {
         let signature = signature.parse()?;
-        
+
         match self.rpc_client.get_transaction_with_config(
             &signature,
             solana_client::rpc_config::RpcTransactionConfig {

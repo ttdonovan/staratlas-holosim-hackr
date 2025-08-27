@@ -1981,6 +1981,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "hackr-saproc"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "borsh 0.10.4",
+ "chrono",
+ "clap",
+ "dotenv",
+ "envy",
+ "hex",
+ "serde",
+ "serde_json",
+ "solana-account-decoder",
+ "solana-sdk",
+ "sqlx",
+ "staratlas-holosim",
+ "staratlas-player-profile",
+ "staratlas-profile-faction",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
 name = "hash32"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

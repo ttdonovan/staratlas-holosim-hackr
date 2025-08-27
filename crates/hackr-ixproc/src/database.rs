@@ -169,7 +169,7 @@ pub mod db {
 
         pub async fn batch_upsert_accounts(&self, accounts: &[AccountData]) -> Result<()> {
             let mut tx = self.pool.begin().await?;
-            
+
             for account_data in accounts {
                 sqlx::query(
                     r#"
@@ -199,7 +199,7 @@ pub mod db {
                 .execute(&mut *tx)
                 .await?;
             }
-            
+
             tx.commit().await?;
             Ok(())
         }
