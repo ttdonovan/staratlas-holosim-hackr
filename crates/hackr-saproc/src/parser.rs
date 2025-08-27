@@ -1,26 +1,36 @@
 use anyhow::Result;
-use borsh::BorshDeserialize;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use solana_sdk::pubkey::Pubkey;
 use std::str::FromStr;
+use uuid::Uuid;
 
-use crate::database::AccountData;
+use crate::database::{AccountData, Database, HolosimAccount};
 use crate::discriminator::Discriminators;
 
-pub struct AccountParser {
+pub struct AccountParser<'a> {
     discriminators: Discriminators,
+    database: Option<&'a Database>,
 }
 
-impl AccountParser {
+impl<'a> AccountParser<'a> {
     pub fn new() -> Self {
         Self {
             discriminators: Discriminators::new(),
+            database: None,
         }
     }
 
-    pub fn parse_account(&self, account: &AccountData) -> Result<ParsedAccount> {
+    pub fn with_database(database: &'a Database) -> Self {
+        Self {
+            discriminators: Discriminators::new(),
+            database: Some(database),
+        }
+    }
+
+    pub async fn parse_account(&self, account: &AccountData) -> Result<ParsedAccount> {
         let program_id = Pubkey::from_str(&account.program_id)?;
         let account_pubkey = Pubkey::from_str(&account.account_pubkey)?;
 
@@ -53,7 +63,7 @@ impl AccountParser {
             }
         };
 
-        Ok(ParsedAccount {
+        let parsed_account = ParsedAccount {
             program_id,
             account_pubkey,
             account_type: account_type.to_string(),
@@ -62,7 +72,40 @@ impl AccountParser {
             raw_data_length: account.data.len(),
             created_at: account.created_at,
             updated_at: account.updated_at,
-        })
+        };
+
+        // Save to database if enabled
+        if let Some(db) = self.database {
+            let mut hasher = Sha256::new();
+            hasher.update(&account.data);
+            let hash_result = hasher.finalize();
+            let raw_data_hash = hex::encode(hash_result);
+
+            let holosim_account = HolosimAccount {
+                id: Uuid::new_v4().to_string(),
+                account_pubkey: account_pubkey.to_string(),
+                account_type: account_type.to_string(),
+                parsed_data: parsed_account.parsed_data.clone(),
+                raw_data_hash,
+                created_at: Utc::now(),
+                updated_at: Utc::now(),
+            };
+
+            match account.program_id.as_str() {
+                "SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF" => {
+                    db.upsert_holosim_account(&holosim_account).await?;
+                }
+                "PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ" => {
+                    db.upsert_player_profile_account(&holosim_account).await?;
+                }
+                "pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj" => {
+                    db.upsert_profile_faction_account(&holosim_account).await?;
+                }
+                _ => {}
+            }
+        }
+
+        Ok(parsed_account)
     }
 
     fn parse_holosim_account(&self, data: &[u8], account_type: &str) -> Result<Value> {
@@ -112,7 +155,7 @@ pub struct ParsedAccount {
     pub updated_at: DateTime<Utc>,
 }
 
-impl Default for AccountParser {
+impl<'a> Default for AccountParser<'a> {
     fn default() -> Self {
         Self::new()
     }

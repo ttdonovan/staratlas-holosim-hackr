@@ -88,20 +88,20 @@ hackr-saproc [OPTIONS]
 
 Options:
       --database-url <DATABASE_URL>
-          Database URL (SQLite file path from hackr-ixproc) [default: hackr_ixproc.db]
-      
+          Database URL (SQLite file path from hackr-ixproc) [default: hackr.db]
+
       --program-id <PROGRAM_ID>
           Program ID to filter accounts (optional, processes all if not specified)
-      
+
       --stats-only
           Only show account statistics without processing
-      
+
       --output <OUTPUT>
           Output format (json, summary, detailed) [default: summary]
-      
+
       --limit <LIMIT>
           Limit number of accounts to process (for testing)
-      
+
   -h, --help
           Print help
 ```

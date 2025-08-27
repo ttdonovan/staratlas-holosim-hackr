@@ -38,10 +38,13 @@ async fn main() -> Result<()> {
     if let Some(limit) = config.args.limit {
         info!("  Limit: {} accounts", limit);
     }
+    if config.args.write {
+        info!("  Write mode: ENABLED (will save parsed accounts)");
+    }
 
     // Connect to database
     info!("🗄️ Connecting to database...");
-    let db = Database::new(&config.database_url).await?;
+    let db = Database::new(&config.database_url, config.args.write).await?;
     info!("✅ Database connected");
 
     if config.args.stats_only {
@@ -73,14 +76,18 @@ async fn main() -> Result<()> {
 
     // Parse accounts
     info!("🔍 Parsing account data...");
-    let parser = AccountParser::new();
+    let parser = if config.args.write {
+        AccountParser::with_database(&db)
+    } else {
+        AccountParser::new()
+    };
 
     let mut parsed_count = 0;
     let mut error_count = 0;
     let mut type_counts = std::collections::HashMap::new();
 
     for account in accounts_to_process {
-        match parser.parse_account(&account) {
+        match parser.parse_account(&account).await {
             Ok(parsed_account) => {
                 parsed_count += 1;
                 *type_counts
@@ -135,6 +142,7 @@ async fn main() -> Result<()> {
 async fn show_stats(db: &Database) -> Result<()> {
     info!("📊 Database statistics:");
 
+    info!("Raw accounts by program:");
     let stats = db.get_account_stats().await?;
     let mut total_accounts = 0;
 
@@ -144,6 +152,33 @@ async fn show_stats(db: &Database) -> Result<()> {
     }
 
     info!("  Total: {} accounts", total_accounts);
+
+    // Show parsed account stats
+    info!("\nParsed accounts:");
+
+    let holosim_stats = db.get_holosim_account_stats().await?;
+    if !holosim_stats.is_empty() {
+        info!("  Holosim accounts:");
+        for (account_type, count) in holosim_stats {
+            info!("    {}: {}", account_type, count);
+        }
+    }
+
+    let player_profile_stats = db.get_player_profile_account_stats().await?;
+    if !player_profile_stats.is_empty() {
+        info!("  Player Profile accounts:");
+        for (account_type, count) in player_profile_stats {
+            info!("    {}: {}", account_type, count);
+        }
+    }
+
+    let profile_faction_stats = db.get_profile_faction_account_stats().await?;
+    if !profile_faction_stats.is_empty() {
+        info!("  Profile Faction accounts:");
+        for (account_type, count) in profile_faction_stats {
+            info!("    {}: {}", account_type, count);
+        }
+    }
 
     Ok(())
 }

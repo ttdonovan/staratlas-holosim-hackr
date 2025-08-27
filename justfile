@@ -45,7 +45,7 @@ hackr-ix-help:
 
 # Clean up generated database files
 hackr-ix-clean-db:
-    rm -f hackr_ixproc.db hackr_ixproc.db-shm hackr_ixproc.db-wal
+    rm -f hackr.db hackr.db-shm hackr.db-wal
 
 # hackr-saproc commands
 # Show database statistics for stored accounts
@@ -95,3 +95,30 @@ hackr-sa-build-release:
 # Show hackr-saproc help
 hackr-sa-help:
     cargo run -p hackr-saproc -- --help
+
+# Process accounts with write mode (save parsed data)
+hackr-sa-run-write:
+    cargo run -p hackr-saproc -- --write
+
+# Process specific program with write mode
+hackr-sa-run-write-program PROGRAM_ID:
+    cargo run -p hackr-saproc -- --program-id {{PROGRAM_ID}} --write
+
+# Process Holosim accounts with write mode
+hackr-sa-holosim-write:
+    cargo run -p hackr-saproc -- --program-id SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF --write
+
+# Process limited accounts with write mode (for testing)
+hackr-sa-run-write-limit COUNT:
+    cargo run -p hackr-saproc -- --limit {{COUNT}} --write --output detailed
+
+# Database documentation commands
+# Export database schema to docs folder
+db-schema-export:
+    @echo "Exporting database schema..."
+    @sqlite3 hackr.db ".schema" > docs/database-schema.sql
+    @echo "Schema exported to docs/database-schema.sql"
+
+# Show database schema in terminal
+db-schema-show:
+    sqlite3 hackr.db ".schema"

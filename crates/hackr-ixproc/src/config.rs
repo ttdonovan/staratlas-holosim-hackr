@@ -20,7 +20,7 @@ pub struct Args {
     pub database: bool,
 
     /// Database URL (SQLite file path)
-    #[arg(long, default_value = "hackr_ixproc.db")]
+    #[arg(long, default_value = "hackr.db")]
     pub database_url: String,
 
     /// Dump all existing accounts for monitored programs on startup

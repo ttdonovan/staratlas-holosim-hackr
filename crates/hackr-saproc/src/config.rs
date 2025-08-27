@@ -11,7 +11,7 @@ pub struct EnvConfig {
 #[command(about = "Star Atlas Solana account processor - parses stored account data")]
 pub struct Args {
     /// Database URL (SQLite file path from hackr-ixproc)
-    #[arg(long, default_value = "hackr_ixproc.db")]
+    #[arg(long, default_value = "hackr.db")]
     pub database_url: String,
 
     /// Program ID to filter accounts (optional, processes all if not specified)
@@ -29,6 +29,10 @@ pub struct Args {
     /// Limit number of accounts to process (for testing)
     #[arg(long)]
     pub limit: Option<usize>,
+
+    /// Enable writing parsed accounts to database tables
+    #[arg(long)]
+    pub write: bool,
 }
 
 #[derive(Debug)]
