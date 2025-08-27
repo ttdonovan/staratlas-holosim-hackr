@@ -4,7 +4,7 @@ Extract Star Atlas game balance/configuration data from the local database for g
 
 ## Overview
 
-`hackr-gamedata` reads Game and GameState accounts from the SQLite database populated by `hackr-ixproc` and `hackr-saproc`, then exports them in formats suitable for loading into game engines like Macroquad or Godot. This allows you to initialize your game world with the same configuration parameters used by the on-chain game.
+`hackr-gamedata` reads Game accounts and all associated game data from the SQLite database populated by `hackr-ixproc` and `hackr-saproc`, then exports them in formats suitable for loading into game engines like Macroquad or Godot. This allows you to initialize your game world with the same configuration parameters and world data used by the on-chain game.
 
 ## Prerequisites
 
@@ -14,12 +14,17 @@ Extract Star Atlas game balance/configuration data from the local database for g
 
 ## Purpose
 
-When building an off-chain game client or simulation that mirrors Star Atlas gameplay, you need access to the core game configuration data. This tool:
+When building an off-chain game client or simulation that mirrors Star Atlas gameplay, you need access to the core game configuration data and world state. This tool:
 
 1. Reads Game accounts from the `holosim_accounts` table
-2. Optionally fetches associated GameState accounts
-3. Exports the data in RON or JSON format
-4. Creates metadata about when/how the data was extracted
+2. Fetches associated GameState accounts
+3. Extracts all related game world data:
+   - Planet accounts (all planets in the game)
+   - MineItem accounts (minable resources)
+   - Starbase accounts (when available)
+4. Exports the data in RON or JSON format
+5. Organizes output in game-specific subdirectories
+6. Creates metadata about when/how the data was extracted
 
 ## Usage
 
@@ -54,16 +59,29 @@ hackr-gamedata --game-pubkey ABC123...XYZ --output-name my_game_config
 
 ### Output Files
 
-The tool creates two files:
+The tool creates a subdirectory for each game (using the game pubkey) containing:
 
-1. **Game balance data** (`game_balance_<pubkey>.ron` or `.json`)
-   - Contains all configuration data
+1. **Game balance data** (`game_balance.ron` or `.json`)
+   - Game configuration data
+   - GameState information
+   - All Planets in the game world
+   - All MineItems (resources)
+   - All Starbases (when available)
    - Ready to load into your game engine
 
-2. **Metadata** (`game_balance_<pubkey>_metadata.json`)
+2. **Metadata** (`game_balance_metadata.json`)
    - Extraction timestamp
    - Version information
-   - RPC endpoint used
+   - Count of each entity type
+   - Database source
+
+Example output structure:
+```
+gamedata/
+└── GAMEC7U7cqmFFaRow33j1LwuV8u4YhAS1mJ5Dqjnar2k/
+    ├── game_balance.ron
+    └── game_balance_metadata.json
+```
 
 ## Integration with Game Engines
 
@@ -141,6 +159,16 @@ The exported data includes:
   - Fleet information
   - Miscellaneous variables
   - Dynamic game state
+
+- **World Data**
+  - **Planets**: All planets with their properties
+    - Name, position (sector & sub-coordinates)
+    - Planet type, size, health
+    - Mining stats (amount mined, resources, miners)
+  - **Mine Items**: All minable resources
+    - Resource name, mint address
+    - Hardness, number of resource accounts
+  - **Starbases**: Space station data (when available)
 
 ## Future Enhancements
 

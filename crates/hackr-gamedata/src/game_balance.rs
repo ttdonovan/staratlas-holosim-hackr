@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use ui_holosim::{GameUI, GameStateUI};
+use ui_holosim::{GameUI, GameStateUI, PlanetUI, MineItemUI, StarbaseUI};
 
 /// Game balance data structure for export
 /// This represents the core configuration data needed to initialize a game world
@@ -17,6 +17,15 @@ pub struct GameBalance {
     
     /// Associated game state (if available)
     pub game_state: Option<GameStateData>,
+    
+    /// Planets associated with this game
+    pub planets: Vec<PlanetUI>,
+    
+    /// Mine items associated with this game  
+    pub mine_items: Vec<MineItemUI>,
+    
+    /// Starbases associated with this game
+    pub starbases: Vec<StarbaseUI>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -102,8 +111,15 @@ pub struct MiscConfig {
 }
 
 impl GameBalance {
-    /// Create from UI types
-    pub fn from_ui(game_pubkey: &str, game: &GameUI, game_state: Option<&GameStateUI>) -> Self {
+    /// Create from UI types with additional game data
+    pub fn from_ui(
+        game_pubkey: &str, 
+        game: &GameUI, 
+        game_state: Option<&GameStateUI>,
+        planets: Vec<PlanetUI>,
+        mine_items: Vec<MineItemUI>,
+        starbases: Vec<StarbaseUI>,
+    ) -> Self {
         GameBalance {
             game_id: game_pubkey.to_string(),
             version: game.version,
@@ -140,6 +156,9 @@ impl GameBalance {
                     placeholder: gs.misc.placeholder.clone(),
                 },
             }),
+            planets,
+            mine_items,
+            starbases,
         }
     }
     

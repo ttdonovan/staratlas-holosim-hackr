@@ -4,7 +4,7 @@ use sqlx::sqlite::SqlitePool;
 use std::fs;
 use std::path::Path;
 use tracing::{info, warn, error};
-use ui_holosim::{GameUI, GameStateUI};
+use ui_holosim::{GameUI, GameStateUI, PlanetUI, MineItemUI, StarbaseUI};
 
 mod config;
 mod game_balance;
@@ -119,13 +119,99 @@ async fn main() -> Result<()> {
             None
         };
         
+        // Fetch associated Planets
+        info!("🌍 Fetching associated Planet accounts...");
+        let planet_accounts = sqlx::query_as::<_, HolosimAccount>(
+            "SELECT account_pubkey, account_type, parsed_data 
+             FROM holosim_accounts 
+             WHERE account_type = 'Planet' AND json_extract(parsed_data, '$.game_id') = ?"
+        )
+        .bind(&game_account.account_pubkey)
+        .fetch_all(&pool)
+        .await?;
+        
+        let planets: Vec<PlanetUI> = planet_accounts.into_iter()
+            .filter_map(|account| {
+                match serde_json::from_value::<PlanetUI>(account.parsed_data) {
+                    Ok(planet) => Some(planet),
+                    Err(e) => {
+                        warn!("Failed to parse Planet account: {}", e);
+                        None
+                    }
+                }
+            })
+            .collect();
+        
+        info!("  Found {} Planet(s)", planets.len());
+        
+        // Fetch associated MineItems
+        info!("⛏️  Fetching associated MineItem accounts...");
+        let mine_item_accounts = sqlx::query_as::<_, HolosimAccount>(
+            "SELECT account_pubkey, account_type, parsed_data 
+             FROM holosim_accounts 
+             WHERE account_type = 'MineItem' AND json_extract(parsed_data, '$.game_id') = ?"
+        )
+        .bind(&game_account.account_pubkey)
+        .fetch_all(&pool)
+        .await?;
+        
+        let mine_items: Vec<MineItemUI> = mine_item_accounts.into_iter()
+            .filter_map(|account| {
+                match serde_json::from_value::<MineItemUI>(account.parsed_data) {
+                    Ok(mine_item) => Some(mine_item),
+                    Err(e) => {
+                        warn!("Failed to parse MineItem account: {}", e);
+                        None
+                    }
+                }
+            })
+            .collect();
+        
+        info!("  Found {} MineItem(s)", mine_items.len());
+        
+        // Fetch associated Starbases (if they exist)
+        info!("🚀 Fetching associated Starbase accounts...");
+        let starbase_accounts = sqlx::query_as::<_, HolosimAccount>(
+            "SELECT account_pubkey, account_type, parsed_data 
+             FROM holosim_accounts 
+             WHERE account_type = 'Starbase' AND json_extract(parsed_data, '$.game_id') = ?"
+        )
+        .bind(&game_account.account_pubkey)
+        .fetch_all(&pool)
+        .await?;
+        
+        let starbases: Vec<StarbaseUI> = starbase_accounts.into_iter()
+            .filter_map(|account| {
+                match serde_json::from_value::<StarbaseUI>(account.parsed_data) {
+                    Ok(starbase) => Some(starbase),
+                    Err(e) => {
+                        warn!("Failed to parse Starbase account: {}", e);
+                        None
+                    }
+                }
+            })
+            .collect();
+        
+        info!("  Found {} Starbase(s)", starbases.len());
+        
         // Create game balance structure
-        let game_balance = GameBalance::from_ui(&game_account.account_pubkey, &game_ui, game_state_ui.as_ref());
+        let game_balance = GameBalance::from_ui(
+            &game_account.account_pubkey, 
+            &game_ui, 
+            game_state_ui.as_ref(),
+            planets,
+            mine_items,
+            starbases,
+        );
+        
+        // Create subdirectory for this game
+        let game_output_dir = Path::new(&config.output_dir).join(&game_account.account_pubkey);
+        fs::create_dir_all(&game_output_dir)?;
         
         // Determine output filename
         let base_name = config.args.output_name
             .clone()
-            .unwrap_or_else(|| format!("game_balance_{}", game_account.account_pubkey));
+            .unwrap_or_else(|| "game_balance".to_string());
         
         // Export based on format
         let (content, extension) = match config.output_format {
@@ -139,9 +225,8 @@ async fn main() -> Result<()> {
             }
         };
         
-        // Write to file
-        let output_path = Path::new(&config.output_dir)
-            .join(format!("{}.{}", base_name, extension));
+        // Write to file in game-specific directory
+        let output_path = game_output_dir.join(format!("{}.{}", base_name, extension));
         
         fs::write(&output_path, content)?;
         info!("✅ Exported game balance data to: {}", output_path.display());
@@ -153,11 +238,13 @@ async fn main() -> Result<()> {
             "game_version": game_ui.version,
             "game_update_id": game_ui.update_id,
             "game_state_included": game_state_ui.is_some(),
+            "planet_count": game_balance.planets.len(),
+            "mine_item_count": game_balance.mine_items.len(),
+            "starbase_count": game_balance.starbases.len(),
             "database_source": config.database_url,
         });
         
-        let metadata_path = Path::new(&config.output_dir)
-            .join(format!("{}_metadata.json", base_name));
+        let metadata_path = game_output_dir.join(format!("{}_metadata.json", base_name));
         
         fs::write(&metadata_path, serde_json::to_string_pretty(&metadata)?)?;
         info!("📋 Metadata written to: {}", metadata_path.display());
