@@ -347,4 +347,118 @@ impl Database {
 
         Ok(stats)
     }
+
+    pub async fn batch_upsert_holosim_accounts(&self, accounts: &[HolosimAccount]) -> Result<()> {
+        if !self.write_enabled {
+            return Err(anyhow::anyhow!("Database is in read-only mode"));
+        }
+
+        let mut tx = self.pool.begin().await?;
+
+        for account in accounts {
+            sqlx::query(
+                r#"
+                INSERT INTO holosim_accounts (
+                    id, account_pubkey, account_type, parsed_data, raw_data_hash,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(account_pubkey) DO UPDATE SET
+                    account_type = excluded.account_type,
+                    parsed_data = excluded.parsed_data,
+                    raw_data_hash = excluded.raw_data_hash,
+                    updated_at = excluded.updated_at
+                "#,
+            )
+            .bind(&account.id)
+            .bind(&account.account_pubkey)
+            .bind(&account.account_type)
+            .bind(serde_json::to_string(&account.parsed_data)?)
+            .bind(&account.raw_data_hash)
+            .bind(account.created_at.to_rfc3339())
+            .bind(account.updated_at.to_rfc3339())
+            .execute(&mut *tx)
+            .await?;
+        }
+
+        tx.commit().await?;
+        Ok(())
+    }
+
+    pub async fn batch_upsert_player_profile_accounts(
+        &self,
+        accounts: &[HolosimAccount],
+    ) -> Result<()> {
+        if !self.write_enabled {
+            return Err(anyhow::anyhow!("Database is in read-only mode"));
+        }
+
+        let mut tx = self.pool.begin().await?;
+
+        for account in accounts {
+            sqlx::query(
+                r#"
+                INSERT INTO player_profile_accounts (
+                    id, account_pubkey, account_type, parsed_data, raw_data_hash,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(account_pubkey) DO UPDATE SET
+                    account_type = excluded.account_type,
+                    parsed_data = excluded.parsed_data,
+                    raw_data_hash = excluded.raw_data_hash,
+                    updated_at = excluded.updated_at
+                "#,
+            )
+            .bind(&account.id)
+            .bind(&account.account_pubkey)
+            .bind(&account.account_type)
+            .bind(serde_json::to_string(&account.parsed_data)?)
+            .bind(&account.raw_data_hash)
+            .bind(account.created_at.to_rfc3339())
+            .bind(account.updated_at.to_rfc3339())
+            .execute(&mut *tx)
+            .await?;
+        }
+
+        tx.commit().await?;
+        Ok(())
+    }
+
+    pub async fn batch_upsert_profile_faction_accounts(
+        &self,
+        accounts: &[HolosimAccount],
+    ) -> Result<()> {
+        if !self.write_enabled {
+            return Err(anyhow::anyhow!("Database is in read-only mode"));
+        }
+
+        let mut tx = self.pool.begin().await?;
+
+        for account in accounts {
+            sqlx::query(
+                r#"
+                INSERT INTO profile_faction_accounts (
+                    id, account_pubkey, account_type, parsed_data, raw_data_hash,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(account_pubkey) DO UPDATE SET
+                    account_type = excluded.account_type,
+                    parsed_data = excluded.parsed_data,
+                    raw_data_hash = excluded.raw_data_hash,
+                    updated_at = excluded.updated_at
+                "#,
+            )
+            .bind(&account.id)
+            .bind(&account.account_pubkey)
+            .bind(&account.account_type)
+            .bind(serde_json::to_string(&account.parsed_data)?)
+            .bind(&account.raw_data_hash)
+            .bind(account.created_at.to_rfc3339())
+            .bind(account.updated_at.to_rfc3339())
+            .execute(&mut *tx)
+            .await?;
+        }
+
+        tx.commit().await?;
+        Ok(())
+    }
 }

@@ -102,6 +102,12 @@ Options:
       --limit <LIMIT>
           Limit number of accounts to process (for testing)
 
+      --write
+          Enable writing parsed accounts to database tables
+
+      --batch-size <BATCH_SIZE>
+          Batch size for database writes (default: 1000)
+
   -h, --help
           Print help
 ```
@@ -157,6 +163,8 @@ The parser currently:
 2. Identifies the program each account belongs to
 3. Attempts to match discriminators to known account types
 4. Returns basic information about each account
+5. Can save parsed data to program-specific tables with `--write` flag
+6. Uses batch processing for efficient database writes
 
 ### Not Yet Implemented
 
@@ -183,7 +191,9 @@ To extend the parser with actual account deserialization:
 - The path is correct (relative to where you run the command)
 - The database was created by hackr-ixproc
 
-**Performance**: Processing large numbers of accounts can be slow. Use:
-- `--limit` to process fewer accounts during testing
-- `--program-id` to focus on specific programs
-- `--output summary` to reduce output overhead
+**Performance**: Processing large numbers of accounts:
+- Use `--limit` to process fewer accounts during testing
+- Use `--program-id` to focus on specific programs
+- Use `--output summary` to reduce output overhead
+- Adjust `--batch-size` for write performance (default: 1000)
+- With batch processing, writing 5000+ accounts takes seconds instead of minutes

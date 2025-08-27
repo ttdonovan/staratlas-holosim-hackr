@@ -40,6 +40,7 @@ async fn main() -> Result<()> {
     }
     if config.args.write {
         info!("  Write mode: ENABLED (will save parsed accounts)");
+        info!("  Batch size: {} accounts", config.args.batch_size);
     }
 
     // Connect to database
@@ -76,23 +77,70 @@ async fn main() -> Result<()> {
 
     // Parse accounts
     info!("🔍 Parsing account data...");
-    let parser = if config.args.write {
-        AccountParser::with_database(&db)
-    } else {
-        AccountParser::new()
-    };
+    let parser = AccountParser::new();
 
     let mut parsed_count = 0;
     let mut error_count = 0;
     let mut type_counts = std::collections::HashMap::new();
 
+    // Collections for batching
+    let mut holosim_batch = Vec::new();
+    let mut player_profile_batch = Vec::new();
+    let mut profile_faction_batch = Vec::new();
+
     for account in accounts_to_process {
-        match parser.parse_account(&account).await {
-            Ok(parsed_account) => {
+        match parser.parse_account(&account) {
+            Ok((parsed_account, db_account)) => {
                 parsed_count += 1;
                 *type_counts
                     .entry(parsed_account.account_type.clone())
                     .or_insert(0) += 1;
+
+                // Collect accounts for batch processing
+                if config.args.write {
+                    if let Some(db_account) = db_account {
+                        match account.program_id.as_str() {
+                            "SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF" => {
+                                holosim_batch.push(db_account);
+                            }
+                            "PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ" => {
+                                player_profile_batch.push(db_account);
+                            }
+                            "pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj" => {
+                                profile_faction_batch.push(db_account);
+                            }
+                            _ => {}
+                        }
+
+                        // Flush batches when they reach the configured size
+                        if holosim_batch.len() >= config.args.batch_size {
+                            info!(
+                                "💾 Writing batch of {} Holosim accounts...",
+                                holosim_batch.len()
+                            );
+                            db.batch_upsert_holosim_accounts(&holosim_batch).await?;
+                            holosim_batch.clear();
+                        }
+                        if player_profile_batch.len() >= config.args.batch_size {
+                            info!(
+                                "💾 Writing batch of {} Player Profile accounts...",
+                                player_profile_batch.len()
+                            );
+                            db.batch_upsert_player_profile_accounts(&player_profile_batch)
+                                .await?;
+                            player_profile_batch.clear();
+                        }
+                        if profile_faction_batch.len() >= config.args.batch_size {
+                            info!(
+                                "💾 Writing batch of {} Profile Faction accounts...",
+                                profile_faction_batch.len()
+                            );
+                            db.batch_upsert_profile_faction_accounts(&profile_faction_batch)
+                                .await?;
+                            profile_faction_batch.clear();
+                        }
+                    }
+                }
 
                 match config.args.output.as_str() {
                     "json" => {
@@ -123,6 +171,33 @@ async fn main() -> Result<()> {
                 error_count += 1;
                 error!("Failed to parse account {}: {}", account.account_pubkey, e);
             }
+        }
+    }
+
+    // Write any remaining batches
+    if config.args.write {
+        if !holosim_batch.is_empty() {
+            info!(
+                "💾 Writing final batch of {} Holosim accounts...",
+                holosim_batch.len()
+            );
+            db.batch_upsert_holosim_accounts(&holosim_batch).await?;
+        }
+        if !player_profile_batch.is_empty() {
+            info!(
+                "💾 Writing final batch of {} Player Profile accounts...",
+                player_profile_batch.len()
+            );
+            db.batch_upsert_player_profile_accounts(&player_profile_batch)
+                .await?;
+        }
+        if !profile_faction_batch.is_empty() {
+            info!(
+                "💾 Writing final batch of {} Profile Faction accounts...",
+                profile_faction_batch.len()
+            );
+            db.batch_upsert_profile_faction_accounts(&profile_faction_batch)
+                .await?;
         }
     }
 

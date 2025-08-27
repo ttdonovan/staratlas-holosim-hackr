@@ -33,6 +33,10 @@ pub struct Args {
     /// Enable writing parsed accounts to database tables
     #[arg(long)]
     pub write: bool,
+
+    /// Batch size for database writes (default: 1000)
+    #[arg(long, default_value = "1000")]
+    pub batch_size: usize,
 }
 
 #[derive(Debug)]
