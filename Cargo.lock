@@ -2543,6 +2543,9 @@ name = "holosim-examples"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "borsh 1.5.7",
+ "bs58",
+ "chrono",
  "dotenv",
  "envy",
  "futures-util",
@@ -2550,6 +2553,7 @@ dependencies = [
  "solana-account-decoder",
  "solana-client",
  "solana-sdk",
+ "solana-transaction-status",
  "staratlas-holosim",
  "staratlas-player-profile",
  "tokio",

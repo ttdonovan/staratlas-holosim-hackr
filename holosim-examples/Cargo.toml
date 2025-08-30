@@ -5,6 +5,9 @@ edition.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+borsh.workspace = true
+bs58.workspace = true
+chrono.workspace = true
 dotenv.workspace = true
 envy.workspace = true
 futures-util.workspace = true
@@ -12,6 +15,7 @@ serde = { "workspace" = true, features = ["derive"] }
 solana-account-decoder.workspace = true
 solana-client.workspace = true
 solana-sdk.workspace = true
+solana-transaction-status.workspace = true
 staratlas-holosim.workspace = true
 staratlas-player-profile.workspace = true
 tokio.workspace = true
