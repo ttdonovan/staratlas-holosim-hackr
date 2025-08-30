@@ -8,31 +8,31 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const FLEET_STATE_HANDLER_DISCRIMINATOR: [u8; 8] = [114, 77, 252, 27, 52, 161, 2, 156];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct FleetStateHandler {
     /// The fleet.
-    pub fleet: solana_program::pubkey::Pubkey,
+    pub fleet: solana_pubkey::Pubkey,
 }
 
 impl FleetStateHandler {
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
     #[allow(clippy::arithmetic_side_effects)]
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(1 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.fleet, false,
-        ));
+        accounts.push(solana_instruction::AccountMeta::new(self.fleet, false));
         accounts.extend_from_slice(remaining_accounts);
         let data = borsh::to_vec(&FleetStateHandlerInstructionData::new()).unwrap();
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -67,8 +67,8 @@ impl Default for FleetStateHandlerInstructionData {
 ///   0. `[writable]` fleet
 #[derive(Clone, Debug, Default)]
 pub struct FleetStateHandlerBuilder {
-    fleet: Option<solana_program::pubkey::Pubkey>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    fleet: Option<solana_pubkey::Pubkey>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl FleetStateHandlerBuilder {
@@ -77,16 +77,13 @@ impl FleetStateHandlerBuilder {
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fleet(&mut self, fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.fleet = Some(fleet);
         self
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -94,13 +91,13 @@ impl FleetStateHandlerBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = FleetStateHandler {
             fleet: self.fleet.expect("fleet is not set"),
         };
@@ -112,20 +109,20 @@ impl FleetStateHandlerBuilder {
 /// `fleet_state_handler` CPI accounts.
 pub struct FleetStateHandlerCpiAccounts<'a, 'b> {
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `fleet_state_handler` CPI instruction.
 pub struct FleetStateHandlerCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
 }
 
 impl<'a, 'b> FleetStateHandlerCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: FleetStateHandlerCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
@@ -134,25 +131,18 @@ impl<'a, 'b> FleetStateHandlerCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -161,19 +151,12 @@ impl<'a, 'b> FleetStateHandlerCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(1 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.fleet.key,
-            false,
-        ));
+        accounts.push(solana_instruction::AccountMeta::new(*self.fleet.key, false));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -181,7 +164,7 @@ impl<'a, 'b> FleetStateHandlerCpi<'a, 'b> {
         });
         let data = borsh::to_vec(&FleetStateHandlerInstructionData::new()).unwrap();
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -194,9 +177,9 @@ impl<'a, 'b> FleetStateHandlerCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -212,7 +195,7 @@ pub struct FleetStateHandlerCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> FleetStateHandlerCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(FleetStateHandlerCpiBuilderInstruction {
             __program: program,
             fleet: None,
@@ -222,7 +205,7 @@ impl<'a, 'b> FleetStateHandlerCpiBuilder<'a, 'b> {
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn fleet(&mut self, fleet: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.fleet = Some(fleet);
         self
     }
@@ -230,7 +213,7 @@ impl<'a, 'b> FleetStateHandlerCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -246,11 +229,7 @@ impl<'a, 'b> FleetStateHandlerCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -258,15 +237,12 @@ impl<'a, 'b> FleetStateHandlerCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let instruction = FleetStateHandlerCpi {
             __program: self.instruction.__program,
 
@@ -281,12 +257,8 @@ impl<'a, 'b> FleetStateHandlerCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct FleetStateHandlerCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

@@ -23,7 +23,7 @@ A lightweight Solana program activity monitor with real-time transaction and acc
 2. **Configure programs to monitor** (edit `.env`):
    ```bash
    # Star Atlas programs (example)
-   PROGRAMS=SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF,PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ
+   PROGRAMS=SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9,PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ
 
    # Solana RPC endpoints
    RPC_URL=https://rpc.ironforge.network/devnet?apiKey=01JEB7YQ0YPK31WQTC0VQ5Y9YP
@@ -81,7 +81,7 @@ curl http://localhost:8080/stats
 ## Monitored Program Types
 
 ### Star Atlas Programs
-- **Holosim (SAGE)**: `SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF`
+- **Holosim (SAGE)**: `SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9`
 - **Player Profile**: `PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ`
 - **Profile Faction**: `pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj`
 - **C4 Sage**: `C4SAgeKLgb3pTLWhVr6NRwWyYFuTR7ZeSXFrzoLwfMzF`

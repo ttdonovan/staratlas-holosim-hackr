@@ -8,26 +8,25 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const ADD_RENTAL_DISCRIMINATOR: [u8; 8] = [213, 113, 170, 123, 187, 90, 28, 115];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct AddRental {
     /// The fleet owner's profile.
-    pub owner_profile: solana_program::pubkey::Pubkey,
+    pub owner_profile: solana_pubkey::Pubkey,
     /// The key on the owner profile with renting permissions.
-    pub owner_key: solana_program::pubkey::Pubkey,
+    pub owner_key: solana_pubkey::Pubkey,
     /// The fleet rental invalidator - this is a signer to help make sure the fleet won't be locked.
-    pub invalidator: solana_program::pubkey::Pubkey,
+    pub invalidator: solana_pubkey::Pubkey,
     /// The fleet to rent out.
-    pub fleet: solana_program::pubkey::Pubkey,
+    pub fleet: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
 }
 
 impl AddRental {
-    pub fn instruction(
-        &self,
-        args: AddRentalInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self, args: AddRentalInstructionArgs) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -35,25 +34,23 @@ impl AddRental {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: AddRentalInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owner_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owner_key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.invalidator,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.fleet, false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.fleet, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
@@ -62,7 +59,7 @@ impl AddRental {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -107,13 +104,13 @@ pub struct AddRentalInstructionArgs {
 ///   4. `[]` game_id
 #[derive(Clone, Debug, Default)]
 pub struct AddRentalBuilder {
-    owner_profile: Option<solana_program::pubkey::Pubkey>,
-    owner_key: Option<solana_program::pubkey::Pubkey>,
-    invalidator: Option<solana_program::pubkey::Pubkey>,
-    fleet: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
+    owner_profile: Option<solana_pubkey::Pubkey>,
+    owner_key: Option<solana_pubkey::Pubkey>,
+    invalidator: Option<solana_pubkey::Pubkey>,
+    fleet: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
     owner_key_index: Option<u16>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl AddRentalBuilder {
@@ -122,31 +119,31 @@ impl AddRentalBuilder {
     }
     /// The fleet owner's profile.
     #[inline(always)]
-    pub fn owner_profile(&mut self, owner_profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn owner_profile(&mut self, owner_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.owner_profile = Some(owner_profile);
         self
     }
     /// The key on the owner profile with renting permissions.
     #[inline(always)]
-    pub fn owner_key(&mut self, owner_key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn owner_key(&mut self, owner_key: solana_pubkey::Pubkey) -> &mut Self {
         self.owner_key = Some(owner_key);
         self
     }
     /// The fleet rental invalidator - this is a signer to help make sure the fleet won't be locked.
     #[inline(always)]
-    pub fn invalidator(&mut self, invalidator: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn invalidator(&mut self, invalidator: solana_pubkey::Pubkey) -> &mut Self {
         self.invalidator = Some(invalidator);
         self
     }
     /// The fleet to rent out.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fleet(&mut self, fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
@@ -157,10 +154,7 @@ impl AddRentalBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -168,13 +162,13 @@ impl AddRentalBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = AddRental {
             owner_profile: self.owner_profile.expect("owner_profile is not set"),
             owner_key: self.owner_key.expect("owner_key is not set"),
@@ -196,38 +190,38 @@ impl AddRentalBuilder {
 /// `add_rental` CPI accounts.
 pub struct AddRentalCpiAccounts<'a, 'b> {
     /// The fleet owner's profile.
-    pub owner_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owner_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The key on the owner profile with renting permissions.
-    pub owner_key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owner_key: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet rental invalidator - this is a signer to help make sure the fleet won't be locked.
-    pub invalidator: &'b solana_program::account_info::AccountInfo<'a>,
+    pub invalidator: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet to rent out.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `add_rental` CPI instruction.
 pub struct AddRentalCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet owner's profile.
-    pub owner_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owner_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The key on the owner profile with renting permissions.
-    pub owner_key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owner_key: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet rental invalidator - this is a signer to help make sure the fleet won't be locked.
-    pub invalidator: &'b solana_program::account_info::AccountInfo<'a>,
+    pub invalidator: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet to rent out.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: AddRentalInstructionArgs,
 }
 
 impl<'a, 'b> AddRentalCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: AddRentalCpiAccounts<'a, 'b>,
         args: AddRentalInstructionArgs,
     ) -> Self {
@@ -242,25 +236,18 @@ impl<'a, 'b> AddRentalCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -269,35 +256,28 @@ impl<'a, 'b> AddRentalCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owner_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owner_key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.invalidator.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.fleet.key,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(*self.fleet.key, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -307,7 +287,7 @@ impl<'a, 'b> AddRentalCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -324,9 +304,9 @@ impl<'a, 'b> AddRentalCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -346,7 +326,7 @@ pub struct AddRentalCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> AddRentalCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(AddRentalCpiBuilderInstruction {
             __program: program,
             owner_profile: None,
@@ -363,17 +343,14 @@ impl<'a, 'b> AddRentalCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owner_profile(
         &mut self,
-        owner_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        owner_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owner_profile = Some(owner_profile);
         self
     }
     /// The key on the owner profile with renting permissions.
     #[inline(always)]
-    pub fn owner_key(
-        &mut self,
-        owner_key: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn owner_key(&mut self, owner_key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.owner_key = Some(owner_key);
         self
     }
@@ -381,23 +358,20 @@ impl<'a, 'b> AddRentalCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn invalidator(
         &mut self,
-        invalidator: &'b solana_program::account_info::AccountInfo<'a>,
+        invalidator: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.invalidator = Some(invalidator);
         self
     }
     /// The fleet to rent out.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn fleet(&mut self, fleet: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -410,7 +384,7 @@ impl<'a, 'b> AddRentalCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -426,11 +400,7 @@ impl<'a, 'b> AddRentalCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -438,15 +408,12 @@ impl<'a, 'b> AddRentalCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = AddRentalInstructionArgs {
             owner_key_index: self
                 .instruction
@@ -483,17 +450,13 @@ impl<'a, 'b> AddRentalCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct AddRentalCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    owner_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owner_key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    invalidator: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    owner_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owner_key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    invalidator: Option<&'b solana_account_info::AccountInfo<'a>>,
+    fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
     owner_key_index: Option<u16>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

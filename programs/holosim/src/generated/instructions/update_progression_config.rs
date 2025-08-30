@@ -9,26 +9,28 @@ use crate::generated::types::ProgressionItemInputUnpacked;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const UPDATE_PROGRESSION_CONFIG_DISCRIMINATOR: [u8; 8] = [39, 217, 150, 82, 237, 214, 100, 184];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct UpdateProgressionConfig {
     /// The [`ProgressionConfig`] account
-    pub progression_config: solana_program::pubkey::Pubkey,
+    pub progression_config: solana_pubkey::Pubkey,
     /// The key authorized for this instruction
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The [`Profile`] account
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The Solana System program
-    pub system_program: solana_program::pubkey::Pubkey,
+    pub system_program: solana_pubkey::Pubkey,
 }
 
 impl UpdateProgressionConfig {
     pub fn instruction(
         &self,
         args: UpdateProgressionConfigInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -36,25 +38,25 @@ impl UpdateProgressionConfig {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: UpdateProgressionConfigInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.progression_config,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
@@ -63,7 +65,7 @@ impl UpdateProgressionConfig {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -115,11 +117,11 @@ pub struct UpdateProgressionConfigInstructionArgs {
 ///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct UpdateProgressionConfigBuilder {
-    progression_config: Option<solana_program::pubkey::Pubkey>,
-    key: Option<solana_program::pubkey::Pubkey>,
-    profile: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    system_program: Option<solana_program::pubkey::Pubkey>,
+    progression_config: Option<solana_pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    profile: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    system_program: Option<solana_pubkey::Pubkey>,
     key_index: Option<u16>,
     daily_lp_limit: Option<u64>,
     daily_council_rank_xp_limit: Option<u64>,
@@ -128,7 +130,7 @@ pub struct UpdateProgressionConfigBuilder {
     daily_mining_xp_limit: Option<u64>,
     daily_crafting_xp_limit: Option<u64>,
     items: Option<Vec<ProgressionItemInputUnpacked>>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl UpdateProgressionConfigBuilder {
@@ -137,35 +139,32 @@ impl UpdateProgressionConfigBuilder {
     }
     /// The [`ProgressionConfig`] account
     #[inline(always)]
-    pub fn progression_config(
-        &mut self,
-        progression_config: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn progression_config(&mut self, progression_config: solana_pubkey::Pubkey) -> &mut Self {
         self.progression_config = Some(progression_config);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
     /// The Solana System program
     #[inline(always)]
-    pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
         self
     }
@@ -218,10 +217,7 @@ impl UpdateProgressionConfigBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -229,13 +225,13 @@ impl UpdateProgressionConfigBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = UpdateProgressionConfig {
             progression_config: self
                 .progression_config
@@ -245,7 +241,7 @@ impl UpdateProgressionConfigBuilder {
             game_id: self.game_id.expect("game_id is not set"),
             system_program: self
                 .system_program
-                .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+                .unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
         };
         let args = UpdateProgressionConfigInstructionArgs {
             key_index: self.key_index.clone().expect("key_index is not set"),
@@ -265,38 +261,38 @@ impl UpdateProgressionConfigBuilder {
 /// `update_progression_config` CPI accounts.
 pub struct UpdateProgressionConfigCpiAccounts<'a, 'b> {
     /// The [`ProgressionConfig`] account
-    pub progression_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub progression_config: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `update_progression_config` CPI instruction.
 pub struct UpdateProgressionConfigCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The [`ProgressionConfig`] account
-    pub progression_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub progression_config: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: UpdateProgressionConfigInstructionArgs,
 }
 
 impl<'a, 'b> UpdateProgressionConfigCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: UpdateProgressionConfigCpiAccounts<'a, 'b>,
         args: UpdateProgressionConfigInstructionArgs,
     ) -> Self {
@@ -311,25 +307,18 @@ impl<'a, 'b> UpdateProgressionConfigCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -338,35 +327,31 @@ impl<'a, 'b> UpdateProgressionConfigCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.progression_config.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -376,7 +361,7 @@ impl<'a, 'b> UpdateProgressionConfigCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -393,9 +378,9 @@ impl<'a, 'b> UpdateProgressionConfigCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -415,7 +400,7 @@ pub struct UpdateProgressionConfigCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> UpdateProgressionConfigCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(UpdateProgressionConfigCpiBuilderInstruction {
             __program: program,
             progression_config: None,
@@ -439,32 +424,26 @@ impl<'a, 'b> UpdateProgressionConfigCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn progression_config(
         &mut self,
-        progression_config: &'b solana_program::account_info::AccountInfo<'a>,
+        progression_config: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.progression_config = Some(progression_config);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -472,7 +451,7 @@ impl<'a, 'b> UpdateProgressionConfigCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn system_program(
         &mut self,
-        system_program: &'b solana_program::account_info::AccountInfo<'a>,
+        system_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
         self
@@ -528,7 +507,7 @@ impl<'a, 'b> UpdateProgressionConfigCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -544,11 +523,7 @@ impl<'a, 'b> UpdateProgressionConfigCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -556,15 +531,12 @@ impl<'a, 'b> UpdateProgressionConfigCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = UpdateProgressionConfigInstructionArgs {
             key_index: self
                 .instruction
@@ -608,12 +580,12 @@ impl<'a, 'b> UpdateProgressionConfigCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct UpdateProgressionConfigCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    progression_config: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    progression_config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     key_index: Option<u16>,
     daily_lp_limit: Option<u64>,
     daily_council_rank_xp_limit: Option<u64>,
@@ -623,9 +595,5 @@ struct UpdateProgressionConfigCpiBuilderInstruction<'a, 'b> {
     daily_crafting_xp_limit: Option<u64>,
     items: Option<Vec<ProgressionItemInputUnpacked>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

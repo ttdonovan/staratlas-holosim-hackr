@@ -9,40 +9,42 @@ use crate::generated::types::CargoToGameInput;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const DEV_DEPOSIT_CARGO_TO_GAME_DISCRIMINATOR: [u8; 8] = [23, 246, 87, 208, 149, 87, 50, 92];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct DevDepositCargoToGame {
     /// The [`Starbase`] account
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: solana_program::pubkey::Pubkey,
+    pub starbase_player: solana_pubkey::Pubkey,
     /// The new cargo pod
-    pub cargo_pod: solana_program::pubkey::Pubkey,
+    pub cargo_pod: solana_pubkey::Pubkey,
     /// The cargo type account
-    pub cargo_type: solana_program::pubkey::Pubkey,
+    pub cargo_type: solana_pubkey::Pubkey,
     /// The cargo stats definition account
-    pub cargo_stats_definition: solana_program::pubkey::Pubkey,
+    pub cargo_stats_definition: solana_pubkey::Pubkey,
     /// The key authorized for this instruction
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The [`Profile`] account
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The source token account - owned by the `key`
-    pub token_from: solana_program::pubkey::Pubkey,
+    pub token_from: solana_pubkey::Pubkey,
     /// The destination token account - owned by the `cargo_pod`
-    pub token_to: solana_program::pubkey::Pubkey,
+    pub token_to: solana_pubkey::Pubkey,
     /// The Cargo Program
-    pub cargo_program: solana_program::pubkey::Pubkey,
+    pub cargo_program: solana_pubkey::Pubkey,
     /// Token Program
-    pub token_program: solana_program::pubkey::Pubkey,
+    pub token_program: solana_pubkey::Pubkey,
 }
 
 impl DevDepositCargoToGame {
     pub fn instruction(
         &self,
         args: DevDepositCargoToGameInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -50,53 +52,44 @@ impl DevDepositCargoToGame {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: DevDepositCargoToGameInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(12 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase_player,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.cargo_pod,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.cargo_pod, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_type,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_stats_definition,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.token_from,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.token_to,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.token_from, false));
+        accounts.push(solana_instruction::AccountMeta::new(self.token_to, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.token_program,
             false,
         ));
@@ -105,7 +98,7 @@ impl DevDepositCargoToGame {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -157,20 +150,20 @@ pub struct DevDepositCargoToGameInstructionArgs {
 ///   11. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
 #[derive(Clone, Debug, Default)]
 pub struct DevDepositCargoToGameBuilder {
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    starbase_player: Option<solana_program::pubkey::Pubkey>,
-    cargo_pod: Option<solana_program::pubkey::Pubkey>,
-    cargo_type: Option<solana_program::pubkey::Pubkey>,
-    cargo_stats_definition: Option<solana_program::pubkey::Pubkey>,
-    key: Option<solana_program::pubkey::Pubkey>,
-    profile: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    token_from: Option<solana_program::pubkey::Pubkey>,
-    token_to: Option<solana_program::pubkey::Pubkey>,
-    cargo_program: Option<solana_program::pubkey::Pubkey>,
-    token_program: Option<solana_program::pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    starbase_player: Option<solana_pubkey::Pubkey>,
+    cargo_pod: Option<solana_pubkey::Pubkey>,
+    cargo_type: Option<solana_pubkey::Pubkey>,
+    cargo_stats_definition: Option<solana_pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    profile: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    token_from: Option<solana_pubkey::Pubkey>,
+    token_to: Option<solana_pubkey::Pubkey>,
+    cargo_program: Option<solana_pubkey::Pubkey>,
+    token_program: Option<solana_pubkey::Pubkey>,
     input: Option<CargoToGameInput>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl DevDepositCargoToGameBuilder {
@@ -179,28 +172,25 @@ impl DevDepositCargoToGameBuilder {
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The [`StarbasePlayer`] Account
     #[inline(always)]
-    pub fn starbase_player(
-        &mut self,
-        starbase_player: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn starbase_player(&mut self, starbase_player: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase_player = Some(starbase_player);
         self
     }
     /// The new cargo pod
     #[inline(always)]
-    pub fn cargo_pod(&mut self, cargo_pod: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_pod(&mut self, cargo_pod: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_pod = Some(cargo_pod);
         self
     }
     /// The cargo type account
     #[inline(always)]
-    pub fn cargo_type(&mut self, cargo_type: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_type(&mut self, cargo_type: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_type = Some(cargo_type);
         self
     }
@@ -208,51 +198,51 @@ impl DevDepositCargoToGameBuilder {
     #[inline(always)]
     pub fn cargo_stats_definition(
         &mut self,
-        cargo_stats_definition: solana_program::pubkey::Pubkey,
+        cargo_stats_definition: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.cargo_stats_definition = Some(cargo_stats_definition);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The source token account - owned by the `key`
     #[inline(always)]
-    pub fn token_from(&mut self, token_from: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_from(&mut self, token_from: solana_pubkey::Pubkey) -> &mut Self {
         self.token_from = Some(token_from);
         self
     }
     /// The destination token account - owned by the `cargo_pod`
     #[inline(always)]
-    pub fn token_to(&mut self, token_to: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_to(&mut self, token_to: solana_pubkey::Pubkey) -> &mut Self {
         self.token_to = Some(token_to);
         self
     }
     /// The Cargo Program
     #[inline(always)]
-    pub fn cargo_program(&mut self, cargo_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_program(&mut self, cargo_program: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_program = Some(cargo_program);
         self
     }
     /// `[optional account, default to 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA']`
     /// Token Program
     #[inline(always)]
-    pub fn token_program(&mut self, token_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_program(&mut self, token_program: solana_pubkey::Pubkey) -> &mut Self {
         self.token_program = Some(token_program);
         self
     }
@@ -263,10 +253,7 @@ impl DevDepositCargoToGameBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -274,13 +261,13 @@ impl DevDepositCargoToGameBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = DevDepositCargoToGame {
             starbase: self.starbase.expect("starbase is not set"),
             starbase_player: self.starbase_player.expect("starbase_player is not set"),
@@ -295,7 +282,7 @@ impl DevDepositCargoToGameBuilder {
             token_from: self.token_from.expect("token_from is not set"),
             token_to: self.token_to.expect("token_to is not set"),
             cargo_program: self.cargo_program.expect("cargo_program is not set"),
-            token_program: self.token_program.unwrap_or(solana_program::pubkey!(
+            token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!(
                 "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             )),
         };
@@ -310,66 +297,66 @@ impl DevDepositCargoToGameBuilder {
 /// `dev_deposit_cargo_to_game` CPI accounts.
 pub struct DevDepositCargoToGameCpiAccounts<'a, 'b> {
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The new cargo pod
-    pub cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type account
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo stats definition account
-    pub cargo_stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_stats_definition: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The source token account - owned by the `key`
-    pub token_from: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_from: &'b solana_account_info::AccountInfo<'a>,
     /// The destination token account - owned by the `cargo_pod`
-    pub token_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_to: &'b solana_account_info::AccountInfo<'a>,
     /// The Cargo Program
-    pub cargo_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_program: &'b solana_account_info::AccountInfo<'a>,
     /// Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `dev_deposit_cargo_to_game` CPI instruction.
 pub struct DevDepositCargoToGameCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The new cargo pod
-    pub cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type account
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo stats definition account
-    pub cargo_stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_stats_definition: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The source token account - owned by the `key`
-    pub token_from: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_from: &'b solana_account_info::AccountInfo<'a>,
     /// The destination token account - owned by the `cargo_pod`
-    pub token_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_to: &'b solana_account_info::AccountInfo<'a>,
     /// The Cargo Program
-    pub cargo_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_program: &'b solana_account_info::AccountInfo<'a>,
     /// Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: DevDepositCargoToGameInstructionArgs,
 }
 
 impl<'a, 'b> DevDepositCargoToGameCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: DevDepositCargoToGameCpiAccounts<'a, 'b>,
         args: DevDepositCargoToGameInstructionArgs,
     ) -> Self {
@@ -391,25 +378,18 @@ impl<'a, 'b> DevDepositCargoToGameCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -418,63 +398,59 @@ impl<'a, 'b> DevDepositCargoToGameCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(12 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase_player.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.cargo_pod.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_type.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_stats_definition.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.token_from.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.token_to.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.token_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -484,7 +460,7 @@ impl<'a, 'b> DevDepositCargoToGameCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -508,9 +484,9 @@ impl<'a, 'b> DevDepositCargoToGameCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -537,7 +513,7 @@ pub struct DevDepositCargoToGameCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(DevDepositCargoToGameCpiBuilderInstruction {
             __program: program,
             starbase: None,
@@ -559,10 +535,7 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -570,17 +543,14 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn starbase_player(
         &mut self,
-        starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+        starbase_player: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.starbase_player = Some(starbase_player);
         self
     }
     /// The new cargo pod
     #[inline(always)]
-    pub fn cargo_pod(
-        &mut self,
-        cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn cargo_pod(&mut self, cargo_pod: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.cargo_pod = Some(cargo_pod);
         self
     }
@@ -588,7 +558,7 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_type(
         &mut self,
-        cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_type: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_type = Some(cargo_type);
         self
@@ -597,32 +567,26 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_stats_definition(
         &mut self,
-        cargo_stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_stats_definition: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_stats_definition = Some(cargo_stats_definition);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -630,17 +594,14 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_from(
         &mut self,
-        token_from: &'b solana_program::account_info::AccountInfo<'a>,
+        token_from: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_from = Some(token_from);
         self
     }
     /// The destination token account - owned by the `cargo_pod`
     #[inline(always)]
-    pub fn token_to(
-        &mut self,
-        token_to: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn token_to(&mut self, token_to: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.token_to = Some(token_to);
         self
     }
@@ -648,7 +609,7 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_program(
         &mut self,
-        cargo_program: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_program = Some(cargo_program);
         self
@@ -657,7 +618,7 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_program(
         &mut self,
-        token_program: &'b solana_program::account_info::AccountInfo<'a>,
+        token_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_program = Some(token_program);
         self
@@ -671,7 +632,7 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -687,11 +648,7 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -699,15 +656,12 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = DevDepositCargoToGameInstructionArgs {
             input: self.instruction.input.clone().expect("input is not set"),
         };
@@ -760,24 +714,20 @@ impl<'a, 'b> DevDepositCargoToGameCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct DevDepositCargoToGameCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase_player: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_pod: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_type: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_stats_definition: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_from: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_to: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase_player: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_pod: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_type: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_stats_definition: Option<&'b solana_account_info::AccountInfo<'a>>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_from: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_to: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     input: Option<CargoToGameInput>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

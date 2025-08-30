@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Represents a mine-able item existing at a particular location (e.g. a planet)
 
@@ -47,6 +47,8 @@ pub struct Resource {
     pub bump: u8,
 }
 
+pub const RESOURCE_DISCRIMINATOR: [u8; 8] = [10, 160, 2, 1, 42, 207, 51, 212];
+
 impl Resource {
     pub const LEN: usize = 125;
 
@@ -57,12 +59,10 @@ impl Resource {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Resource {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for Resource {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -71,7 +71,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Resource {
 #[cfg(feature = "fetch")]
 pub fn fetch_resource(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<Resource>, std::io::Error> {
     let accounts = fetch_all_resource(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -80,7 +80,7 @@ pub fn fetch_resource(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_resource(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<Resource>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -105,7 +105,7 @@ pub fn fetch_all_resource(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_resource(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<Resource>, std::io::Error> {
     let accounts = fetch_all_maybe_resource(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -114,7 +114,7 @@ pub fn fetch_maybe_resource(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_resource(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<Resource>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -160,5 +160,5 @@ impl anchor_lang::IdlBuild for Resource {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for Resource {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

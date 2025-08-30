@@ -76,14 +76,14 @@ $ solana balance
 
 [Star Atlas Build: Resources for Builders](https://build.staratlas.com/)
 
-* Holosim - [SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF](https://explorer.atlasnet.staratlas.cloud/address/SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF)
+* Holosim - [SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9](https://explorer.atlasnet.staratlas.cloud/address/SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9)
 * Player Profile - [PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ](https://explorer.atlasnet.staratlas.cloud/address/PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ)
   - note: idl.json downloaded from mainnet `pprofELXjL5Kck7Jn5hCpwAL82DpTkSYBENzahVtbc9`
 * Profile Faction - [pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj](https://explorer.atlasnet.staratlas.cloud/address/pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj)
   - note: idl.json downloaded from mainnet `pFACSRuobDmvfMKq1bAzwj27t6d2GJhSCHb1VcfnRmq`
 
 ```bash
-$ solana program dump SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF programs/holosim/SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF.so
+$ solana program dump SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9 programs/holosim/SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9.so
 $ solana program dump PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ programs/player_profile/PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ.so
 $ solana program dump pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj programs/profile_faction/pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj.so
 ```

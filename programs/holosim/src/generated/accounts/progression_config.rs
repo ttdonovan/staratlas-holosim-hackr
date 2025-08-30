@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Progression Config
 
@@ -39,6 +39,8 @@ pub struct ProgressionConfig {
     pub num_items: u16,
 }
 
+pub const PROGRESSION_CONFIG_DISCRIMINATOR: [u8; 8] = [224, 156, 129, 95, 15, 29, 132, 208];
+
 impl ProgressionConfig {
     pub const LEN: usize = 91;
 
@@ -49,12 +51,10 @@ impl ProgressionConfig {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for ProgressionConfig {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for ProgressionConfig {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -63,7 +63,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Progression
 #[cfg(feature = "fetch")]
 pub fn fetch_progression_config(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<ProgressionConfig>, std::io::Error> {
     let accounts = fetch_all_progression_config(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -72,7 +72,7 @@ pub fn fetch_progression_config(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_progression_config(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<ProgressionConfig>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -97,7 +97,7 @@ pub fn fetch_all_progression_config(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_progression_config(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<ProgressionConfig>, std::io::Error> {
     let accounts = fetch_all_maybe_progression_config(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -106,7 +106,7 @@ pub fn fetch_maybe_progression_config(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_progression_config(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<ProgressionConfig>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -152,5 +152,5 @@ impl anchor_lang::IdlBuild for ProgressionConfig {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for ProgressionConfig {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

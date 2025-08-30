@@ -43,7 +43,7 @@ impl AccountParser {
         // Parse based on program ID and discriminator
         let parsed_data = match account.program_id.as_str() {
             // Holosim program
-            "SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF" => {
+            "SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9" => {
                 self.parse_holosim_account(&account.data, account_type)?
             }
             // Player Profile program

@@ -9,46 +9,48 @@ use crate::generated::types::CrewTransferInput;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const REMOVE_CREW_FROM_GAME_DISCRIMINATOR: [u8; 8] = [242, 139, 76, 15, 23, 182, 100, 117];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct RemoveCrewFromGame {
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: solana_program::pubkey::Pubkey,
+    pub sage_player_profile: solana_pubkey::Pubkey,
     /// The [`Starbase`] account
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: solana_program::pubkey::Pubkey,
+    pub starbase_player: solana_pubkey::Pubkey,
     /// The [`SageCrewConfig`] Account
-    pub sage_crew_config: solana_program::pubkey::Pubkey,
+    pub sage_crew_config: solana_pubkey::Pubkey,
     /// The key authorized for this instruction
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The [`Profile`] account
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub profile_faction: solana_program::pubkey::Pubkey,
+    pub profile_faction: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The crew program `CrewConfig` account
-    pub crew_config: solana_program::pubkey::Pubkey,
+    pub crew_config: solana_pubkey::Pubkey,
     /// The new crew owner
-    pub new_crew_owner: solana_program::pubkey::Pubkey,
+    pub new_crew_owner: solana_pubkey::Pubkey,
     /// The crew delegate
-    pub crew_delegate: solana_program::pubkey::Pubkey,
+    pub crew_delegate: solana_pubkey::Pubkey,
     /// The log wrapper
-    pub log_wrapper: solana_program::pubkey::Pubkey,
+    pub log_wrapper: solana_pubkey::Pubkey,
     /// The compression program
-    pub compression_program: solana_program::pubkey::Pubkey,
+    pub compression_program: solana_pubkey::Pubkey,
     /// The bubblegum program
-    pub bubblegum_program: solana_program::pubkey::Pubkey,
+    pub bubblegum_program: solana_pubkey::Pubkey,
     /// The Solana System program
-    pub system_program: solana_program::pubkey::Pubkey,
+    pub system_program: solana_pubkey::Pubkey,
 }
 
 impl RemoveCrewFromGame {
     pub fn instruction(
         &self,
         args: RemoveCrewFromGameInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -56,65 +58,65 @@ impl RemoveCrewFromGame {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: RemoveCrewFromGameInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(15 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.sage_player_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.starbase_player,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.sage_crew_config,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crew_config,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.new_crew_owner,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crew_delegate,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.log_wrapper,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.compression_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.bubblegum_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
@@ -123,7 +125,7 @@ impl RemoveCrewFromGame {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -179,24 +181,24 @@ pub struct RemoveCrewFromGameInstructionArgs {
 ///   14. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct RemoveCrewFromGameBuilder {
-    sage_player_profile: Option<solana_program::pubkey::Pubkey>,
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    starbase_player: Option<solana_program::pubkey::Pubkey>,
-    sage_crew_config: Option<solana_program::pubkey::Pubkey>,
-    key: Option<solana_program::pubkey::Pubkey>,
-    profile: Option<solana_program::pubkey::Pubkey>,
-    profile_faction: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    crew_config: Option<solana_program::pubkey::Pubkey>,
-    new_crew_owner: Option<solana_program::pubkey::Pubkey>,
-    crew_delegate: Option<solana_program::pubkey::Pubkey>,
-    log_wrapper: Option<solana_program::pubkey::Pubkey>,
-    compression_program: Option<solana_program::pubkey::Pubkey>,
-    bubblegum_program: Option<solana_program::pubkey::Pubkey>,
-    system_program: Option<solana_program::pubkey::Pubkey>,
+    sage_player_profile: Option<solana_pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    starbase_player: Option<solana_pubkey::Pubkey>,
+    sage_crew_config: Option<solana_pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    profile: Option<solana_pubkey::Pubkey>,
+    profile_faction: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    crew_config: Option<solana_pubkey::Pubkey>,
+    new_crew_owner: Option<solana_pubkey::Pubkey>,
+    crew_delegate: Option<solana_pubkey::Pubkey>,
+    log_wrapper: Option<solana_pubkey::Pubkey>,
+    compression_program: Option<solana_pubkey::Pubkey>,
+    bubblegum_program: Option<solana_pubkey::Pubkey>,
+    system_program: Option<solana_pubkey::Pubkey>,
     items: Option<Vec<CrewTransferInput>>,
     key_index: Option<u16>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl RemoveCrewFromGameBuilder {
@@ -205,110 +207,92 @@ impl RemoveCrewFromGameBuilder {
     }
     /// The [`SagePlayerProfile`] account
     #[inline(always)]
-    pub fn sage_player_profile(
-        &mut self,
-        sage_player_profile: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn sage_player_profile(&mut self, sage_player_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.sage_player_profile = Some(sage_player_profile);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The [`StarbasePlayer`] Account
     #[inline(always)]
-    pub fn starbase_player(
-        &mut self,
-        starbase_player: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn starbase_player(&mut self, starbase_player: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase_player = Some(starbase_player);
         self
     }
     /// The [`SageCrewConfig`] Account
     #[inline(always)]
-    pub fn sage_crew_config(
-        &mut self,
-        sage_crew_config: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn sage_crew_config(&mut self, sage_crew_config: solana_pubkey::Pubkey) -> &mut Self {
         self.sage_crew_config = Some(sage_crew_config);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The faction that the profile belongs to.
     #[inline(always)]
-    pub fn profile_faction(
-        &mut self,
-        profile_faction: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn profile_faction(&mut self, profile_faction: solana_pubkey::Pubkey) -> &mut Self {
         self.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The crew program `CrewConfig` account
     #[inline(always)]
-    pub fn crew_config(&mut self, crew_config: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn crew_config(&mut self, crew_config: solana_pubkey::Pubkey) -> &mut Self {
         self.crew_config = Some(crew_config);
         self
     }
     /// The new crew owner
     #[inline(always)]
-    pub fn new_crew_owner(&mut self, new_crew_owner: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn new_crew_owner(&mut self, new_crew_owner: solana_pubkey::Pubkey) -> &mut Self {
         self.new_crew_owner = Some(new_crew_owner);
         self
     }
     /// The crew delegate
     #[inline(always)]
-    pub fn crew_delegate(&mut self, crew_delegate: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn crew_delegate(&mut self, crew_delegate: solana_pubkey::Pubkey) -> &mut Self {
         self.crew_delegate = Some(crew_delegate);
         self
     }
     /// The log wrapper
     #[inline(always)]
-    pub fn log_wrapper(&mut self, log_wrapper: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn log_wrapper(&mut self, log_wrapper: solana_pubkey::Pubkey) -> &mut Self {
         self.log_wrapper = Some(log_wrapper);
         self
     }
     /// The compression program
     #[inline(always)]
-    pub fn compression_program(
-        &mut self,
-        compression_program: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn compression_program(&mut self, compression_program: solana_pubkey::Pubkey) -> &mut Self {
         self.compression_program = Some(compression_program);
         self
     }
     /// The bubblegum program
     #[inline(always)]
-    pub fn bubblegum_program(
-        &mut self,
-        bubblegum_program: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn bubblegum_program(&mut self, bubblegum_program: solana_pubkey::Pubkey) -> &mut Self {
         self.bubblegum_program = Some(bubblegum_program);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
     /// The Solana System program
     #[inline(always)]
-    pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
         self
     }
@@ -324,10 +308,7 @@ impl RemoveCrewFromGameBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -335,13 +316,13 @@ impl RemoveCrewFromGameBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = RemoveCrewFromGame {
             sage_player_profile: self
                 .sage_player_profile
@@ -365,7 +346,7 @@ impl RemoveCrewFromGameBuilder {
                 .expect("bubblegum_program is not set"),
             system_program: self
                 .system_program
-                .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+                .unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
         };
         let args = RemoveCrewFromGameInstructionArgs {
             items: self.items.clone().expect("items is not set"),
@@ -379,78 +360,78 @@ impl RemoveCrewFromGameBuilder {
 /// `remove_crew_from_game` CPI accounts.
 pub struct RemoveCrewFromGameCpiAccounts<'a, 'b> {
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SageCrewConfig`] Account
-    pub sage_crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The crew program `CrewConfig` account
-    pub crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// The new crew owner
-    pub new_crew_owner: &'b solana_program::account_info::AccountInfo<'a>,
+    pub new_crew_owner: &'b solana_account_info::AccountInfo<'a>,
     /// The crew delegate
-    pub crew_delegate: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crew_delegate: &'b solana_account_info::AccountInfo<'a>,
     /// The log wrapper
-    pub log_wrapper: &'b solana_program::account_info::AccountInfo<'a>,
+    pub log_wrapper: &'b solana_account_info::AccountInfo<'a>,
     /// The compression program
-    pub compression_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub compression_program: &'b solana_account_info::AccountInfo<'a>,
     /// The bubblegum program
-    pub bubblegum_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub bubblegum_program: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `remove_crew_from_game` CPI instruction.
 pub struct RemoveCrewFromGameCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SageCrewConfig`] Account
-    pub sage_crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The crew program `CrewConfig` account
-    pub crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// The new crew owner
-    pub new_crew_owner: &'b solana_program::account_info::AccountInfo<'a>,
+    pub new_crew_owner: &'b solana_account_info::AccountInfo<'a>,
     /// The crew delegate
-    pub crew_delegate: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crew_delegate: &'b solana_account_info::AccountInfo<'a>,
     /// The log wrapper
-    pub log_wrapper: &'b solana_program::account_info::AccountInfo<'a>,
+    pub log_wrapper: &'b solana_account_info::AccountInfo<'a>,
     /// The compression program
-    pub compression_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub compression_program: &'b solana_account_info::AccountInfo<'a>,
     /// The bubblegum program
-    pub bubblegum_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub bubblegum_program: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: RemoveCrewFromGameInstructionArgs,
 }
 
 impl<'a, 'b> RemoveCrewFromGameCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: RemoveCrewFromGameCpiAccounts<'a, 'b>,
         args: RemoveCrewFromGameInstructionArgs,
     ) -> Self {
@@ -475,25 +456,18 @@ impl<'a, 'b> RemoveCrewFromGameCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -502,75 +476,71 @@ impl<'a, 'b> RemoveCrewFromGameCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(15 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.sage_player_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.starbase_player.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.sage_crew_config.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crew_config.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.new_crew_owner.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crew_delegate.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.log_wrapper.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.compression_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.bubblegum_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -580,7 +550,7 @@ impl<'a, 'b> RemoveCrewFromGameCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -607,9 +577,9 @@ impl<'a, 'b> RemoveCrewFromGameCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -639,7 +609,7 @@ pub struct RemoveCrewFromGameCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(RemoveCrewFromGameCpiBuilderInstruction {
             __program: program,
             sage_player_profile: None,
@@ -667,17 +637,14 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn sage_player_profile(
         &mut self,
-        sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.sage_player_profile = Some(sage_player_profile);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -685,7 +652,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn starbase_player(
         &mut self,
-        starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+        starbase_player: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.starbase_player = Some(starbase_player);
         self
@@ -694,23 +661,20 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn sage_crew_config(
         &mut self,
-        sage_crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+        sage_crew_config: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.sage_crew_config = Some(sage_crew_config);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
@@ -718,17 +682,14 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn profile_faction(
         &mut self,
-        profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -736,7 +697,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crew_config(
         &mut self,
-        crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+        crew_config: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crew_config = Some(crew_config);
         self
@@ -745,7 +706,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn new_crew_owner(
         &mut self,
-        new_crew_owner: &'b solana_program::account_info::AccountInfo<'a>,
+        new_crew_owner: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.new_crew_owner = Some(new_crew_owner);
         self
@@ -754,7 +715,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crew_delegate(
         &mut self,
-        crew_delegate: &'b solana_program::account_info::AccountInfo<'a>,
+        crew_delegate: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crew_delegate = Some(crew_delegate);
         self
@@ -763,7 +724,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn log_wrapper(
         &mut self,
-        log_wrapper: &'b solana_program::account_info::AccountInfo<'a>,
+        log_wrapper: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.log_wrapper = Some(log_wrapper);
         self
@@ -772,7 +733,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn compression_program(
         &mut self,
-        compression_program: &'b solana_program::account_info::AccountInfo<'a>,
+        compression_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.compression_program = Some(compression_program);
         self
@@ -781,7 +742,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn bubblegum_program(
         &mut self,
-        bubblegum_program: &'b solana_program::account_info::AccountInfo<'a>,
+        bubblegum_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.bubblegum_program = Some(bubblegum_program);
         self
@@ -790,7 +751,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn system_program(
         &mut self,
-        system_program: &'b solana_program::account_info::AccountInfo<'a>,
+        system_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
         self
@@ -809,7 +770,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -825,11 +786,7 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -837,15 +794,12 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = RemoveCrewFromGameInstructionArgs {
             items: self.instruction.items.clone().expect("items is not set"),
             key_index: self
@@ -930,28 +884,24 @@ impl<'a, 'b> RemoveCrewFromGameCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct RemoveCrewFromGameCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    sage_player_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase_player: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    sage_crew_config: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crew_config: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    new_crew_owner: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crew_delegate: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    log_wrapper: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    compression_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    bubblegum_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    sage_player_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase_player: Option<&'b solana_account_info::AccountInfo<'a>>,
+    sage_crew_config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crew_config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    new_crew_owner: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crew_delegate: Option<&'b solana_account_info::AccountInfo<'a>>,
+    log_wrapper: Option<&'b solana_account_info::AccountInfo<'a>>,
+    compression_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    bubblegum_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     items: Option<Vec<CrewTransferInput>>,
     key_index: Option<u16>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

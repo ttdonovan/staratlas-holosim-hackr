@@ -307,19 +307,16 @@ pub enum SageError {
     /// 6098 - Reload In Progress
     #[error("Reload In Progress")]
     ReloadInProgress = 0x17D2,
-    /// 6099 - Generic invalid data
+    /// 6099 - Fleet must be fully repaired before disbanding
+    #[error("Fleet must be fully repaired before disbanding")]
+    FleetNotFullyRepaired = 0x17D3,
+    /// 6100 - Generic invalid data
     #[error("Generic invalid data")]
-    GenericInvalid = 0x17D3,
+    GenericInvalid = 0x17D4,
 }
 
-impl solana_program::program_error::PrintProgramError for SageError {
-    fn print<E>(&self) {
-        solana_program::msg!(&self.to_string());
-    }
-}
-
-impl<T> solana_program::decode_error::DecodeError<T> for SageError {
-    fn type_of() -> &'static str {
-        "SageError"
+impl From<SageError> for solana_program_error::ProgramError {
+    fn from(e: SageError) -> Self {
+        solana_program_error::ProgramError::Custom(e as u32)
     }
 }

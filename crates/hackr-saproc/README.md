@@ -6,7 +6,7 @@ Star Atlas Solana account processor - parses stored account data from the hackr-
 
 `hackr-saproc` reads Solana account data stored by `hackr-ixproc` and attempts to parse it into structured Star Atlas account types. It uses discriminators (the first 8 bytes of account data) to identify account types and can process accounts from the following Star Atlas programs:
 
-- **Holosim** (`SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF`)
+- **Holosim** (`SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9`)
 - **Player Profile** (`PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ`)
 - **Profile Faction** (`pFACzkX2eSpAjDyEohD6i3VRJvREtH9ynbtM1DwVFsj`)
 
@@ -58,7 +58,7 @@ hackr-saproc --output summary
 Process only accounts from a specific program:
 ```bash
 # Process only Holosim accounts
-hackr-saproc --program-id SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF
+hackr-saproc --program-id SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9
 
 # Process only Player Profile accounts
 hackr-saproc --program-id PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ

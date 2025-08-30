@@ -8,62 +8,62 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const REGISTER_SAGE_PLAYER_PROFILE_DISCRIMINATOR: [u8; 8] =
+    [88, 142, 218, 149, 75, 77, 228, 156];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct RegisterSagePlayerProfile {
     /// The player permissions [`Profile`]
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The funder for the new profile
-    pub funder: solana_program::pubkey::Pubkey,
+    pub funder: solana_pubkey::Pubkey,
     /// The `SagePlayerProfile` account
-    pub sage_player_profile: solana_program::pubkey::Pubkey,
+    pub sage_player_profile: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The [`GameState`] account
-    pub game_state: solana_program::pubkey::Pubkey,
+    pub game_state: solana_pubkey::Pubkey,
     /// The Solana System program
-    pub system_program: solana_program::pubkey::Pubkey,
+    pub system_program: solana_pubkey::Pubkey,
 }
 
 impl RegisterSagePlayerProfile {
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
     #[allow(clippy::arithmetic_side_effects)]
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.funder,
-            true,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(self.funder, true));
+        accounts.push(solana_instruction::AccountMeta::new(
             self.sage_player_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_state,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
         let data = borsh::to_vec(&RegisterSagePlayerProfileInstructionData::new()).unwrap();
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -103,13 +103,13 @@ impl Default for RegisterSagePlayerProfileInstructionData {
 ///   5. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct RegisterSagePlayerProfileBuilder {
-    profile: Option<solana_program::pubkey::Pubkey>,
-    funder: Option<solana_program::pubkey::Pubkey>,
-    sage_player_profile: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    game_state: Option<solana_program::pubkey::Pubkey>,
-    system_program: Option<solana_program::pubkey::Pubkey>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    profile: Option<solana_pubkey::Pubkey>,
+    funder: Option<solana_pubkey::Pubkey>,
+    sage_player_profile: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    game_state: Option<solana_pubkey::Pubkey>,
+    system_program: Option<solana_pubkey::Pubkey>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl RegisterSagePlayerProfileBuilder {
@@ -118,50 +118,44 @@ impl RegisterSagePlayerProfileBuilder {
     }
     /// The player permissions [`Profile`]
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The funder for the new profile
     #[inline(always)]
-    pub fn funder(&mut self, funder: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn funder(&mut self, funder: solana_pubkey::Pubkey) -> &mut Self {
         self.funder = Some(funder);
         self
     }
     /// The `SagePlayerProfile` account
     #[inline(always)]
-    pub fn sage_player_profile(
-        &mut self,
-        sage_player_profile: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn sage_player_profile(&mut self, sage_player_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.sage_player_profile = Some(sage_player_profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The [`GameState`] account
     #[inline(always)]
-    pub fn game_state(&mut self, game_state: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_state(&mut self, game_state: solana_pubkey::Pubkey) -> &mut Self {
         self.game_state = Some(game_state);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
     /// The Solana System program
     #[inline(always)]
-    pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
         self
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -169,13 +163,13 @@ impl RegisterSagePlayerProfileBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = RegisterSagePlayerProfile {
             profile: self.profile.expect("profile is not set"),
             funder: self.funder.expect("funder is not set"),
@@ -186,7 +180,7 @@ impl RegisterSagePlayerProfileBuilder {
             game_state: self.game_state.expect("game_state is not set"),
             system_program: self
                 .system_program
-                .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+                .unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
         };
 
         accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
@@ -196,40 +190,40 @@ impl RegisterSagePlayerProfileBuilder {
 /// `register_sage_player_profile` CPI accounts.
 pub struct RegisterSagePlayerProfileCpiAccounts<'a, 'b> {
     /// The player permissions [`Profile`]
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The funder for the new profile
-    pub funder: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funder: &'b solana_account_info::AccountInfo<'a>,
     /// The `SagePlayerProfile` account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `register_sage_player_profile` CPI instruction.
 pub struct RegisterSagePlayerProfileCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The player permissions [`Profile`]
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The funder for the new profile
-    pub funder: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funder: &'b solana_account_info::AccountInfo<'a>,
     /// The `SagePlayerProfile` account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 impl<'a, 'b> RegisterSagePlayerProfileCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: RegisterSagePlayerProfileCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
@@ -243,25 +237,18 @@ impl<'a, 'b> RegisterSagePlayerProfileCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -270,39 +257,32 @@ impl<'a, 'b> RegisterSagePlayerProfileCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.funder.key,
-            true,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(*self.funder.key, true));
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.sage_player_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_state.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -310,7 +290,7 @@ impl<'a, 'b> RegisterSagePlayerProfileCpi<'a, 'b> {
         });
         let data = borsh::to_vec(&RegisterSagePlayerProfileInstructionData::new()).unwrap();
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -328,9 +308,9 @@ impl<'a, 'b> RegisterSagePlayerProfileCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -351,7 +331,7 @@ pub struct RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(RegisterSagePlayerProfileCpiBuilderInstruction {
             __program: program,
             profile: None,
@@ -366,19 +346,13 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
     }
     /// The player permissions [`Profile`]
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
     /// The funder for the new profile
     #[inline(always)]
-    pub fn funder(
-        &mut self,
-        funder: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn funder(&mut self, funder: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.funder = Some(funder);
         self
     }
@@ -386,17 +360,14 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn sage_player_profile(
         &mut self,
-        sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.sage_player_profile = Some(sage_player_profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -404,7 +375,7 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn game_state(
         &mut self,
-        game_state: &'b solana_program::account_info::AccountInfo<'a>,
+        game_state: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.game_state = Some(game_state);
         self
@@ -413,7 +384,7 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn system_program(
         &mut self,
-        system_program: &'b solana_program::account_info::AccountInfo<'a>,
+        system_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
         self
@@ -422,7 +393,7 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -438,11 +409,7 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -450,15 +417,12 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let instruction = RegisterSagePlayerProfileCpi {
             __program: self.instruction.__program,
 
@@ -489,17 +453,13 @@ impl<'a, 'b> RegisterSagePlayerProfileCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct RegisterSagePlayerProfileCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    funder: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    sage_player_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_state: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    funder: Option<&'b solana_account_info::AccountInfo<'a>>,
+    sage_player_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_state: Option<&'b solana_account_info::AccountInfo<'a>>,
+    system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

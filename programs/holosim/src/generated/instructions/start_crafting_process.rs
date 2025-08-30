@@ -9,40 +9,42 @@ use crate::generated::types::KeyIndexInput;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const START_CRAFTING_PROCESS_DISCRIMINATOR: [u8; 8] = [64, 108, 109, 62, 9, 128, 138, 246];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct StartCraftingProcess {
     /// The [`Starbase`] account
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: solana_program::pubkey::Pubkey,
+    pub starbase_player: solana_pubkey::Pubkey,
     /// The [`CraftingInstance`] account
-    pub crafting_instance: solana_program::pubkey::Pubkey,
+    pub crafting_instance: solana_pubkey::Pubkey,
     /// The [`CraftingProcess`] account
-    pub crafting_process: solana_program::pubkey::Pubkey,
+    pub crafting_process: solana_pubkey::Pubkey,
     /// The crafting [`Recipe`]
-    pub crafting_recipe: solana_program::pubkey::Pubkey,
+    pub crafting_recipe: solana_pubkey::Pubkey,
     /// The `CraftingFacility` account
-    pub crafting_facility: solana_program::pubkey::Pubkey,
+    pub crafting_facility: solana_pubkey::Pubkey,
     /// The key authorized for this instruction
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The [`Profile`] account
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub profile_faction: solana_program::pubkey::Pubkey,
+    pub profile_faction: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The [`GameState`] account
-    pub game_state: solana_program::pubkey::Pubkey,
+    pub game_state: solana_pubkey::Pubkey,
     /// The Crafting Program
-    pub crafting_program: solana_program::pubkey::Pubkey,
+    pub crafting_program: solana_pubkey::Pubkey,
 }
 
 impl StartCraftingProcess {
     pub fn instruction(
         &self,
         args: StartCraftingProcessInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -50,53 +52,53 @@ impl StartCraftingProcess {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: StartCraftingProcessInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(12 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase_player,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crafting_instance,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.crafting_process,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.crafting_recipe,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crafting_facility,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_state,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crafting_program,
             false,
         ));
@@ -105,7 +107,7 @@ impl StartCraftingProcess {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -157,20 +159,20 @@ pub struct StartCraftingProcessInstructionArgs {
 ///   11. `[]` crafting_program
 #[derive(Clone, Debug, Default)]
 pub struct StartCraftingProcessBuilder {
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    starbase_player: Option<solana_program::pubkey::Pubkey>,
-    crafting_instance: Option<solana_program::pubkey::Pubkey>,
-    crafting_process: Option<solana_program::pubkey::Pubkey>,
-    crafting_recipe: Option<solana_program::pubkey::Pubkey>,
-    crafting_facility: Option<solana_program::pubkey::Pubkey>,
-    key: Option<solana_program::pubkey::Pubkey>,
-    profile: Option<solana_program::pubkey::Pubkey>,
-    profile_faction: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    game_state: Option<solana_program::pubkey::Pubkey>,
-    crafting_program: Option<solana_program::pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    starbase_player: Option<solana_pubkey::Pubkey>,
+    crafting_instance: Option<solana_pubkey::Pubkey>,
+    crafting_process: Option<solana_pubkey::Pubkey>,
+    crafting_recipe: Option<solana_pubkey::Pubkey>,
+    crafting_facility: Option<solana_pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    profile: Option<solana_pubkey::Pubkey>,
+    profile_faction: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    game_state: Option<solana_pubkey::Pubkey>,
+    crafting_program: Option<solana_pubkey::Pubkey>,
     input: Option<KeyIndexInput>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl StartCraftingProcessBuilder {
@@ -179,94 +181,73 @@ impl StartCraftingProcessBuilder {
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The [`StarbasePlayer`] Account
     #[inline(always)]
-    pub fn starbase_player(
-        &mut self,
-        starbase_player: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn starbase_player(&mut self, starbase_player: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase_player = Some(starbase_player);
         self
     }
     /// The [`CraftingInstance`] account
     #[inline(always)]
-    pub fn crafting_instance(
-        &mut self,
-        crafting_instance: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_instance(&mut self, crafting_instance: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_instance = Some(crafting_instance);
         self
     }
     /// The [`CraftingProcess`] account
     #[inline(always)]
-    pub fn crafting_process(
-        &mut self,
-        crafting_process: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_process(&mut self, crafting_process: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_process = Some(crafting_process);
         self
     }
     /// The crafting [`Recipe`]
     #[inline(always)]
-    pub fn crafting_recipe(
-        &mut self,
-        crafting_recipe: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_recipe(&mut self, crafting_recipe: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_recipe = Some(crafting_recipe);
         self
     }
     /// The `CraftingFacility` account
     #[inline(always)]
-    pub fn crafting_facility(
-        &mut self,
-        crafting_facility: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_facility(&mut self, crafting_facility: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_facility = Some(crafting_facility);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The faction that the profile belongs to.
     #[inline(always)]
-    pub fn profile_faction(
-        &mut self,
-        profile_faction: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn profile_faction(&mut self, profile_faction: solana_pubkey::Pubkey) -> &mut Self {
         self.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The [`GameState`] account
     #[inline(always)]
-    pub fn game_state(&mut self, game_state: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_state(&mut self, game_state: solana_pubkey::Pubkey) -> &mut Self {
         self.game_state = Some(game_state);
         self
     }
     /// The Crafting Program
     #[inline(always)]
-    pub fn crafting_program(
-        &mut self,
-        crafting_program: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_program(&mut self, crafting_program: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_program = Some(crafting_program);
         self
     }
@@ -277,10 +258,7 @@ impl StartCraftingProcessBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -288,13 +266,13 @@ impl StartCraftingProcessBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = StartCraftingProcess {
             starbase: self.starbase.expect("starbase is not set"),
             starbase_player: self.starbase_player.expect("starbase_player is not set"),
@@ -324,66 +302,66 @@ impl StartCraftingProcessBuilder {
 /// `start_crafting_process` CPI accounts.
 pub struct StartCraftingProcessCpiAccounts<'a, 'b> {
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The [`CraftingInstance`] account
-    pub crafting_instance: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_instance: &'b solana_account_info::AccountInfo<'a>,
     /// The [`CraftingProcess`] account
-    pub crafting_process: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_process: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting [`Recipe`]
-    pub crafting_recipe: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_recipe: &'b solana_account_info::AccountInfo<'a>,
     /// The `CraftingFacility` account
-    pub crafting_facility: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_facility: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The Crafting Program
-    pub crafting_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `start_crafting_process` CPI instruction.
 pub struct StartCraftingProcessCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The [`CraftingInstance`] account
-    pub crafting_instance: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_instance: &'b solana_account_info::AccountInfo<'a>,
     /// The [`CraftingProcess`] account
-    pub crafting_process: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_process: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting [`Recipe`]
-    pub crafting_recipe: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_recipe: &'b solana_account_info::AccountInfo<'a>,
     /// The `CraftingFacility` account
-    pub crafting_facility: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_facility: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The Crafting Program
-    pub crafting_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: StartCraftingProcessInstructionArgs,
 }
 
 impl<'a, 'b> StartCraftingProcessCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: StartCraftingProcessCpiAccounts<'a, 'b>,
         args: StartCraftingProcessInstructionArgs,
     ) -> Self {
@@ -405,25 +383,18 @@ impl<'a, 'b> StartCraftingProcessCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -432,63 +403,59 @@ impl<'a, 'b> StartCraftingProcessCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(12 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase_player.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crafting_instance.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.crafting_process.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.crafting_recipe.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crafting_facility.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_state.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crafting_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -498,7 +465,7 @@ impl<'a, 'b> StartCraftingProcessCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -522,9 +489,9 @@ impl<'a, 'b> StartCraftingProcessCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -551,7 +518,7 @@ pub struct StartCraftingProcessCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(StartCraftingProcessCpiBuilderInstruction {
             __program: program,
             starbase: None,
@@ -573,10 +540,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -584,7 +548,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn starbase_player(
         &mut self,
-        starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+        starbase_player: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.starbase_player = Some(starbase_player);
         self
@@ -593,7 +557,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_instance(
         &mut self,
-        crafting_instance: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_instance: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_instance = Some(crafting_instance);
         self
@@ -602,7 +566,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_process(
         &mut self,
-        crafting_process: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_process: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_process = Some(crafting_process);
         self
@@ -611,7 +575,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_recipe(
         &mut self,
-        crafting_recipe: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_recipe: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_recipe = Some(crafting_recipe);
         self
@@ -620,23 +584,20 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_facility(
         &mut self,
-        crafting_facility: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_facility: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_facility = Some(crafting_facility);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
@@ -644,17 +605,14 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn profile_faction(
         &mut self,
-        profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -662,7 +620,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn game_state(
         &mut self,
-        game_state: &'b solana_program::account_info::AccountInfo<'a>,
+        game_state: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.game_state = Some(game_state);
         self
@@ -671,7 +629,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_program(
         &mut self,
-        crafting_program: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_program = Some(crafting_program);
         self
@@ -685,7 +643,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -701,11 +659,7 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -713,15 +667,12 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = StartCraftingProcessInstructionArgs {
             input: self.instruction.input.clone().expect("input is not set"),
         };
@@ -783,24 +734,20 @@ impl<'a, 'b> StartCraftingProcessCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct StartCraftingProcessCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase_player: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_instance: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_process: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_recipe: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_facility: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_state: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase_player: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_instance: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_process: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_recipe: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_facility: Option<&'b solana_account_info::AccountInfo<'a>>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_state: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     input: Option<KeyIndexInput>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

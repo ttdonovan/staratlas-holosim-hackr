@@ -100,7 +100,7 @@ async fn main() -> Result<()> {
                 if config.args.write {
                     if let Some(db_account) = db_account {
                         match account.program_id.as_str() {
-                            "SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF" => {
+                            "SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9" => {
                                 holosim_batch.push(db_account);
                             }
                             "PprofUW1pURCnMW2si88GWPXEEK3Bvh9Tksy8WtnoYJ" => {

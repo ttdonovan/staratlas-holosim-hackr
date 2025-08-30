@@ -8,62 +8,61 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const ATTACK_FLEET_DISCRIMINATOR: [u8; 8] = [89, 173, 5, 123, 109, 13, 236, 217];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct AttackFleet {
     /// The key on the profile.
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The profile that owns the fleet.
-    pub owning_profile: solana_program::pubkey::Pubkey,
+    pub owning_profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: solana_program::pubkey::Pubkey,
+    pub owning_profile_faction: solana_pubkey::Pubkey,
     /// The fleet.
-    pub fleet: solana_program::pubkey::Pubkey,
+    pub fleet: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The fleet being attacked
-    pub defending_fleet: solana_program::pubkey::Pubkey,
+    pub defending_fleet: solana_pubkey::Pubkey,
     /// The origin cargo pod; owned by the fleet attacking
-    pub attacking_cargo_pod: solana_program::pubkey::Pubkey,
+    pub attacking_cargo_pod: solana_pubkey::Pubkey,
     /// The destination cargo pod; owned by the fleet defending
-    pub defending_cargo_pod: solana_program::pubkey::Pubkey,
+    pub defending_cargo_pod: solana_pubkey::Pubkey,
     /// The cargo type for ammo
-    pub cargo_type: solana_program::pubkey::Pubkey,
+    pub cargo_type: solana_pubkey::Pubkey,
     /// The cargo stats definition account
-    pub cargo_stats_definition: solana_program::pubkey::Pubkey,
+    pub cargo_stats_definition: solana_pubkey::Pubkey,
     /// The attacker combat XP points account
-    pub attacker_combat_xp: solana_program::pubkey::Pubkey,
+    pub attacker_combat_xp: solana_pubkey::Pubkey,
     /// The attacker council rank XP points account
-    pub attacker_council_rank_xp: solana_program::pubkey::Pubkey,
+    pub attacker_council_rank_xp: solana_pubkey::Pubkey,
     /// The defender combat XP points account
-    pub defender_combat_xp: solana_program::pubkey::Pubkey,
+    pub defender_combat_xp: solana_pubkey::Pubkey,
     /// The defender council rank XP points account
-    pub defender_council_rank_xp: solana_program::pubkey::Pubkey,
+    pub defender_council_rank_xp: solana_pubkey::Pubkey,
     /// The Pilot XP Points Category Account
-    pub combat_xp_category: solana_program::pubkey::Pubkey,
+    pub combat_xp_category: solana_pubkey::Pubkey,
     /// The Council Rank XP Points Category Account
-    pub council_rank_xp_category: solana_program::pubkey::Pubkey,
+    pub council_rank_xp_category: solana_pubkey::Pubkey,
     /// The Pilot XP Modifier Account
-    pub combat_xp_modifier: solana_program::pubkey::Pubkey,
+    pub combat_xp_modifier: solana_pubkey::Pubkey,
     /// The Pilot XP Modifier Account
-    pub council_rank_xp_modifier: solana_program::pubkey::Pubkey,
+    pub council_rank_xp_modifier: solana_pubkey::Pubkey,
     /// The [`ProgressionConfig`] account
-    pub progression_config: solana_program::pubkey::Pubkey,
+    pub progression_config: solana_pubkey::Pubkey,
     /// The [`CombatConfig`] account
-    pub combat_config: solana_program::pubkey::Pubkey,
+    pub combat_config: solana_pubkey::Pubkey,
     /// The attacker's ammo token account - owned by the `attacking_cargo_pod`
-    pub attacking_fleet_ammo_token: solana_program::pubkey::Pubkey,
+    pub attacking_fleet_ammo_token: solana_pubkey::Pubkey,
     /// The defender's ammo token account - owned by the `defending_cargo_pod`
-    pub defending_fleet_ammo_token: solana_program::pubkey::Pubkey,
+    pub defending_fleet_ammo_token: solana_pubkey::Pubkey,
     /// The ammo token mint
-    pub token_mint: solana_program::pubkey::Pubkey,
+    pub token_mint: solana_pubkey::Pubkey,
 }
 
 impl AttackFleet {
-    pub fn instruction(
-        &self,
-        args: AttackFleetInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self, args: AttackFleetInstructionArgs) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -71,105 +70,100 @@ impl AttackFleet {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: AttackFleetInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(23 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.fleet, false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.fleet, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.defending_fleet,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.attacking_cargo_pod,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.defending_cargo_pod,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_type,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_stats_definition,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.attacker_combat_xp,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.attacker_council_rank_xp,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.defender_combat_xp,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.defender_council_rank_xp,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.combat_xp_category,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.council_rank_xp_category,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.combat_xp_modifier,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.council_rank_xp_modifier,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.progression_config,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.combat_config,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.attacking_fleet_ammo_token,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.defending_fleet_ammo_token,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.token_mint,
-            false,
-        ));
+        accounts.push(solana_instruction::AccountMeta::new(self.token_mint, false));
         accounts.extend_from_slice(remaining_accounts);
         let mut data = borsh::to_vec(&AttackFleetInstructionData::new()).unwrap();
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -232,31 +226,31 @@ pub struct AttackFleetInstructionArgs {
 ///   22. `[writable]` token_mint
 #[derive(Clone, Debug, Default)]
 pub struct AttackFleetBuilder {
-    key: Option<solana_program::pubkey::Pubkey>,
-    owning_profile: Option<solana_program::pubkey::Pubkey>,
-    owning_profile_faction: Option<solana_program::pubkey::Pubkey>,
-    fleet: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    defending_fleet: Option<solana_program::pubkey::Pubkey>,
-    attacking_cargo_pod: Option<solana_program::pubkey::Pubkey>,
-    defending_cargo_pod: Option<solana_program::pubkey::Pubkey>,
-    cargo_type: Option<solana_program::pubkey::Pubkey>,
-    cargo_stats_definition: Option<solana_program::pubkey::Pubkey>,
-    attacker_combat_xp: Option<solana_program::pubkey::Pubkey>,
-    attacker_council_rank_xp: Option<solana_program::pubkey::Pubkey>,
-    defender_combat_xp: Option<solana_program::pubkey::Pubkey>,
-    defender_council_rank_xp: Option<solana_program::pubkey::Pubkey>,
-    combat_xp_category: Option<solana_program::pubkey::Pubkey>,
-    council_rank_xp_category: Option<solana_program::pubkey::Pubkey>,
-    combat_xp_modifier: Option<solana_program::pubkey::Pubkey>,
-    council_rank_xp_modifier: Option<solana_program::pubkey::Pubkey>,
-    progression_config: Option<solana_program::pubkey::Pubkey>,
-    combat_config: Option<solana_program::pubkey::Pubkey>,
-    attacking_fleet_ammo_token: Option<solana_program::pubkey::Pubkey>,
-    defending_fleet_ammo_token: Option<solana_program::pubkey::Pubkey>,
-    token_mint: Option<solana_program::pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    owning_profile: Option<solana_pubkey::Pubkey>,
+    owning_profile_faction: Option<solana_pubkey::Pubkey>,
+    fleet: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    defending_fleet: Option<solana_pubkey::Pubkey>,
+    attacking_cargo_pod: Option<solana_pubkey::Pubkey>,
+    defending_cargo_pod: Option<solana_pubkey::Pubkey>,
+    cargo_type: Option<solana_pubkey::Pubkey>,
+    cargo_stats_definition: Option<solana_pubkey::Pubkey>,
+    attacker_combat_xp: Option<solana_pubkey::Pubkey>,
+    attacker_council_rank_xp: Option<solana_pubkey::Pubkey>,
+    defender_combat_xp: Option<solana_pubkey::Pubkey>,
+    defender_council_rank_xp: Option<solana_pubkey::Pubkey>,
+    combat_xp_category: Option<solana_pubkey::Pubkey>,
+    council_rank_xp_category: Option<solana_pubkey::Pubkey>,
+    combat_xp_modifier: Option<solana_pubkey::Pubkey>,
+    council_rank_xp_modifier: Option<solana_pubkey::Pubkey>,
+    progression_config: Option<solana_pubkey::Pubkey>,
+    combat_config: Option<solana_pubkey::Pubkey>,
+    attacking_fleet_ammo_token: Option<solana_pubkey::Pubkey>,
+    defending_fleet_ammo_token: Option<solana_pubkey::Pubkey>,
+    token_mint: Option<solana_pubkey::Pubkey>,
     key_index: Option<u16>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl AttackFleetBuilder {
@@ -265,13 +259,13 @@ impl AttackFleetBuilder {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The profile that owns the fleet.
     #[inline(always)]
-    pub fn owning_profile(&mut self, owning_profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn owning_profile(&mut self, owning_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.owning_profile = Some(owning_profile);
         self
     }
@@ -279,53 +273,44 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: solana_program::pubkey::Pubkey,
+        owning_profile_faction: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fleet(&mut self, fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The fleet being attacked
     #[inline(always)]
-    pub fn defending_fleet(
-        &mut self,
-        defending_fleet: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn defending_fleet(&mut self, defending_fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.defending_fleet = Some(defending_fleet);
         self
     }
     /// The origin cargo pod; owned by the fleet attacking
     #[inline(always)]
-    pub fn attacking_cargo_pod(
-        &mut self,
-        attacking_cargo_pod: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn attacking_cargo_pod(&mut self, attacking_cargo_pod: solana_pubkey::Pubkey) -> &mut Self {
         self.attacking_cargo_pod = Some(attacking_cargo_pod);
         self
     }
     /// The destination cargo pod; owned by the fleet defending
     #[inline(always)]
-    pub fn defending_cargo_pod(
-        &mut self,
-        defending_cargo_pod: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn defending_cargo_pod(&mut self, defending_cargo_pod: solana_pubkey::Pubkey) -> &mut Self {
         self.defending_cargo_pod = Some(defending_cargo_pod);
         self
     }
     /// The cargo type for ammo
     #[inline(always)]
-    pub fn cargo_type(&mut self, cargo_type: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_type(&mut self, cargo_type: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_type = Some(cargo_type);
         self
     }
@@ -333,17 +318,14 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn cargo_stats_definition(
         &mut self,
-        cargo_stats_definition: solana_program::pubkey::Pubkey,
+        cargo_stats_definition: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.cargo_stats_definition = Some(cargo_stats_definition);
         self
     }
     /// The attacker combat XP points account
     #[inline(always)]
-    pub fn attacker_combat_xp(
-        &mut self,
-        attacker_combat_xp: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn attacker_combat_xp(&mut self, attacker_combat_xp: solana_pubkey::Pubkey) -> &mut Self {
         self.attacker_combat_xp = Some(attacker_combat_xp);
         self
     }
@@ -351,17 +333,14 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn attacker_council_rank_xp(
         &mut self,
-        attacker_council_rank_xp: solana_program::pubkey::Pubkey,
+        attacker_council_rank_xp: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.attacker_council_rank_xp = Some(attacker_council_rank_xp);
         self
     }
     /// The defender combat XP points account
     #[inline(always)]
-    pub fn defender_combat_xp(
-        &mut self,
-        defender_combat_xp: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn defender_combat_xp(&mut self, defender_combat_xp: solana_pubkey::Pubkey) -> &mut Self {
         self.defender_combat_xp = Some(defender_combat_xp);
         self
     }
@@ -369,17 +348,14 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn defender_council_rank_xp(
         &mut self,
-        defender_council_rank_xp: solana_program::pubkey::Pubkey,
+        defender_council_rank_xp: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.defender_council_rank_xp = Some(defender_council_rank_xp);
         self
     }
     /// The Pilot XP Points Category Account
     #[inline(always)]
-    pub fn combat_xp_category(
-        &mut self,
-        combat_xp_category: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn combat_xp_category(&mut self, combat_xp_category: solana_pubkey::Pubkey) -> &mut Self {
         self.combat_xp_category = Some(combat_xp_category);
         self
     }
@@ -387,17 +363,14 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn council_rank_xp_category(
         &mut self,
-        council_rank_xp_category: solana_program::pubkey::Pubkey,
+        council_rank_xp_category: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.council_rank_xp_category = Some(council_rank_xp_category);
         self
     }
     /// The Pilot XP Modifier Account
     #[inline(always)]
-    pub fn combat_xp_modifier(
-        &mut self,
-        combat_xp_modifier: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn combat_xp_modifier(&mut self, combat_xp_modifier: solana_pubkey::Pubkey) -> &mut Self {
         self.combat_xp_modifier = Some(combat_xp_modifier);
         self
     }
@@ -405,23 +378,20 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn council_rank_xp_modifier(
         &mut self,
-        council_rank_xp_modifier: solana_program::pubkey::Pubkey,
+        council_rank_xp_modifier: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.council_rank_xp_modifier = Some(council_rank_xp_modifier);
         self
     }
     /// The [`ProgressionConfig`] account
     #[inline(always)]
-    pub fn progression_config(
-        &mut self,
-        progression_config: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn progression_config(&mut self, progression_config: solana_pubkey::Pubkey) -> &mut Self {
         self.progression_config = Some(progression_config);
         self
     }
     /// The [`CombatConfig`] account
     #[inline(always)]
-    pub fn combat_config(&mut self, combat_config: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn combat_config(&mut self, combat_config: solana_pubkey::Pubkey) -> &mut Self {
         self.combat_config = Some(combat_config);
         self
     }
@@ -429,7 +399,7 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn attacking_fleet_ammo_token(
         &mut self,
-        attacking_fleet_ammo_token: solana_program::pubkey::Pubkey,
+        attacking_fleet_ammo_token: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.attacking_fleet_ammo_token = Some(attacking_fleet_ammo_token);
         self
@@ -438,14 +408,14 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn defending_fleet_ammo_token(
         &mut self,
-        defending_fleet_ammo_token: solana_program::pubkey::Pubkey,
+        defending_fleet_ammo_token: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.defending_fleet_ammo_token = Some(defending_fleet_ammo_token);
         self
     }
     /// The ammo token mint
     #[inline(always)]
-    pub fn token_mint(&mut self, token_mint: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_mint(&mut self, token_mint: solana_pubkey::Pubkey) -> &mut Self {
         self.token_mint = Some(token_mint);
         self
     }
@@ -456,10 +426,7 @@ impl AttackFleetBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -467,13 +434,13 @@ impl AttackFleetBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = AttackFleet {
             key: self.key.expect("key is not set"),
             owning_profile: self.owning_profile.expect("owning_profile is not set"),
@@ -540,110 +507,110 @@ impl AttackFleetBuilder {
 /// `attack_fleet` CPI accounts.
 pub struct AttackFleetCpiAccounts<'a, 'b> {
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet being attacked
-    pub defending_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defending_fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The origin cargo pod; owned by the fleet attacking
-    pub attacking_cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacking_cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     /// The destination cargo pod; owned by the fleet defending
-    pub defending_cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defending_cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type for ammo
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo stats definition account
-    pub cargo_stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_stats_definition: &'b solana_account_info::AccountInfo<'a>,
     /// The attacker combat XP points account
-    pub attacker_combat_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacker_combat_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The attacker council rank XP points account
-    pub attacker_council_rank_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacker_council_rank_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The defender combat XP points account
-    pub defender_combat_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defender_combat_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The defender council rank XP points account
-    pub defender_council_rank_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defender_council_rank_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The Pilot XP Points Category Account
-    pub combat_xp_category: &'b solana_program::account_info::AccountInfo<'a>,
+    pub combat_xp_category: &'b solana_account_info::AccountInfo<'a>,
     /// The Council Rank XP Points Category Account
-    pub council_rank_xp_category: &'b solana_program::account_info::AccountInfo<'a>,
+    pub council_rank_xp_category: &'b solana_account_info::AccountInfo<'a>,
     /// The Pilot XP Modifier Account
-    pub combat_xp_modifier: &'b solana_program::account_info::AccountInfo<'a>,
+    pub combat_xp_modifier: &'b solana_account_info::AccountInfo<'a>,
     /// The Pilot XP Modifier Account
-    pub council_rank_xp_modifier: &'b solana_program::account_info::AccountInfo<'a>,
+    pub council_rank_xp_modifier: &'b solana_account_info::AccountInfo<'a>,
     /// The [`ProgressionConfig`] account
-    pub progression_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub progression_config: &'b solana_account_info::AccountInfo<'a>,
     /// The [`CombatConfig`] account
-    pub combat_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub combat_config: &'b solana_account_info::AccountInfo<'a>,
     /// The attacker's ammo token account - owned by the `attacking_cargo_pod`
-    pub attacking_fleet_ammo_token: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacking_fleet_ammo_token: &'b solana_account_info::AccountInfo<'a>,
     /// The defender's ammo token account - owned by the `defending_cargo_pod`
-    pub defending_fleet_ammo_token: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defending_fleet_ammo_token: &'b solana_account_info::AccountInfo<'a>,
     /// The ammo token mint
-    pub token_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_mint: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `attack_fleet` CPI instruction.
 pub struct AttackFleetCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet being attacked
-    pub defending_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defending_fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The origin cargo pod; owned by the fleet attacking
-    pub attacking_cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacking_cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     /// The destination cargo pod; owned by the fleet defending
-    pub defending_cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defending_cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type for ammo
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo stats definition account
-    pub cargo_stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_stats_definition: &'b solana_account_info::AccountInfo<'a>,
     /// The attacker combat XP points account
-    pub attacker_combat_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacker_combat_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The attacker council rank XP points account
-    pub attacker_council_rank_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacker_council_rank_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The defender combat XP points account
-    pub defender_combat_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defender_combat_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The defender council rank XP points account
-    pub defender_council_rank_xp: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defender_council_rank_xp: &'b solana_account_info::AccountInfo<'a>,
     /// The Pilot XP Points Category Account
-    pub combat_xp_category: &'b solana_program::account_info::AccountInfo<'a>,
+    pub combat_xp_category: &'b solana_account_info::AccountInfo<'a>,
     /// The Council Rank XP Points Category Account
-    pub council_rank_xp_category: &'b solana_program::account_info::AccountInfo<'a>,
+    pub council_rank_xp_category: &'b solana_account_info::AccountInfo<'a>,
     /// The Pilot XP Modifier Account
-    pub combat_xp_modifier: &'b solana_program::account_info::AccountInfo<'a>,
+    pub combat_xp_modifier: &'b solana_account_info::AccountInfo<'a>,
     /// The Pilot XP Modifier Account
-    pub council_rank_xp_modifier: &'b solana_program::account_info::AccountInfo<'a>,
+    pub council_rank_xp_modifier: &'b solana_account_info::AccountInfo<'a>,
     /// The [`ProgressionConfig`] account
-    pub progression_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub progression_config: &'b solana_account_info::AccountInfo<'a>,
     /// The [`CombatConfig`] account
-    pub combat_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub combat_config: &'b solana_account_info::AccountInfo<'a>,
     /// The attacker's ammo token account - owned by the `attacking_cargo_pod`
-    pub attacking_fleet_ammo_token: &'b solana_program::account_info::AccountInfo<'a>,
+    pub attacking_fleet_ammo_token: &'b solana_account_info::AccountInfo<'a>,
     /// The defender's ammo token account - owned by the `defending_cargo_pod`
-    pub defending_fleet_ammo_token: &'b solana_program::account_info::AccountInfo<'a>,
+    pub defending_fleet_ammo_token: &'b solana_account_info::AccountInfo<'a>,
     /// The ammo token mint
-    pub token_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_mint: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: AttackFleetInstructionArgs,
 }
 
 impl<'a, 'b> AttackFleetCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: AttackFleetCpiAccounts<'a, 'b>,
         args: AttackFleetInstructionArgs,
     ) -> Self {
@@ -676,25 +643,18 @@ impl<'a, 'b> AttackFleetCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -703,107 +663,100 @@ impl<'a, 'b> AttackFleetCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(23 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.fleet.key,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(*self.fleet.key, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.defending_fleet.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.attacking_cargo_pod.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.defending_cargo_pod.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_type.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_stats_definition.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.attacker_combat_xp.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.attacker_council_rank_xp.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.defender_combat_xp.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.defender_council_rank_xp.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.combat_xp_category.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.council_rank_xp_category.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.combat_xp_modifier.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.council_rank_xp_modifier.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.progression_config.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.combat_config.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.attacking_fleet_ammo_token.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.defending_fleet_ammo_token.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.token_mint.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -813,7 +766,7 @@ impl<'a, 'b> AttackFleetCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -848,9 +801,9 @@ impl<'a, 'b> AttackFleetCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -888,7 +841,7 @@ pub struct AttackFleetCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(AttackFleetCpiBuilderInstruction {
             __program: program,
             key: None,
@@ -921,7 +874,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
@@ -929,7 +882,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile(
         &mut self,
-        owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile = Some(owning_profile);
         self
@@ -938,23 +891,20 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn fleet(&mut self, fleet: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -962,7 +912,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn defending_fleet(
         &mut self,
-        defending_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+        defending_fleet: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.defending_fleet = Some(defending_fleet);
         self
@@ -971,7 +921,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn attacking_cargo_pod(
         &mut self,
-        attacking_cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+        attacking_cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.attacking_cargo_pod = Some(attacking_cargo_pod);
         self
@@ -980,7 +930,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn defending_cargo_pod(
         &mut self,
-        defending_cargo_pod: &'b solana_program::account_info::AccountInfo<'a>,
+        defending_cargo_pod: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.defending_cargo_pod = Some(defending_cargo_pod);
         self
@@ -989,7 +939,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_type(
         &mut self,
-        cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_type: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_type = Some(cargo_type);
         self
@@ -998,7 +948,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_stats_definition(
         &mut self,
-        cargo_stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_stats_definition: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_stats_definition = Some(cargo_stats_definition);
         self
@@ -1007,7 +957,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn attacker_combat_xp(
         &mut self,
-        attacker_combat_xp: &'b solana_program::account_info::AccountInfo<'a>,
+        attacker_combat_xp: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.attacker_combat_xp = Some(attacker_combat_xp);
         self
@@ -1016,7 +966,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn attacker_council_rank_xp(
         &mut self,
-        attacker_council_rank_xp: &'b solana_program::account_info::AccountInfo<'a>,
+        attacker_council_rank_xp: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.attacker_council_rank_xp = Some(attacker_council_rank_xp);
         self
@@ -1025,7 +975,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn defender_combat_xp(
         &mut self,
-        defender_combat_xp: &'b solana_program::account_info::AccountInfo<'a>,
+        defender_combat_xp: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.defender_combat_xp = Some(defender_combat_xp);
         self
@@ -1034,7 +984,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn defender_council_rank_xp(
         &mut self,
-        defender_council_rank_xp: &'b solana_program::account_info::AccountInfo<'a>,
+        defender_council_rank_xp: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.defender_council_rank_xp = Some(defender_council_rank_xp);
         self
@@ -1043,7 +993,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn combat_xp_category(
         &mut self,
-        combat_xp_category: &'b solana_program::account_info::AccountInfo<'a>,
+        combat_xp_category: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.combat_xp_category = Some(combat_xp_category);
         self
@@ -1052,7 +1002,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn council_rank_xp_category(
         &mut self,
-        council_rank_xp_category: &'b solana_program::account_info::AccountInfo<'a>,
+        council_rank_xp_category: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.council_rank_xp_category = Some(council_rank_xp_category);
         self
@@ -1061,7 +1011,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn combat_xp_modifier(
         &mut self,
-        combat_xp_modifier: &'b solana_program::account_info::AccountInfo<'a>,
+        combat_xp_modifier: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.combat_xp_modifier = Some(combat_xp_modifier);
         self
@@ -1070,7 +1020,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn council_rank_xp_modifier(
         &mut self,
-        council_rank_xp_modifier: &'b solana_program::account_info::AccountInfo<'a>,
+        council_rank_xp_modifier: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.council_rank_xp_modifier = Some(council_rank_xp_modifier);
         self
@@ -1079,7 +1029,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn progression_config(
         &mut self,
-        progression_config: &'b solana_program::account_info::AccountInfo<'a>,
+        progression_config: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.progression_config = Some(progression_config);
         self
@@ -1088,7 +1038,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn combat_config(
         &mut self,
-        combat_config: &'b solana_program::account_info::AccountInfo<'a>,
+        combat_config: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.combat_config = Some(combat_config);
         self
@@ -1097,7 +1047,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn attacking_fleet_ammo_token(
         &mut self,
-        attacking_fleet_ammo_token: &'b solana_program::account_info::AccountInfo<'a>,
+        attacking_fleet_ammo_token: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.attacking_fleet_ammo_token = Some(attacking_fleet_ammo_token);
         self
@@ -1106,7 +1056,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn defending_fleet_ammo_token(
         &mut self,
-        defending_fleet_ammo_token: &'b solana_program::account_info::AccountInfo<'a>,
+        defending_fleet_ammo_token: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.defending_fleet_ammo_token = Some(defending_fleet_ammo_token);
         self
@@ -1115,7 +1065,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_mint(
         &mut self,
-        token_mint: &'b solana_program::account_info::AccountInfo<'a>,
+        token_mint: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_mint = Some(token_mint);
         self
@@ -1129,7 +1079,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -1145,11 +1095,7 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -1157,15 +1103,12 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = AttackFleetInstructionArgs {
             key_index: self
                 .instruction
@@ -1286,35 +1229,31 @@ impl<'a, 'b> AttackFleetCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct AttackFleetCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    defending_fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    attacking_cargo_pod: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    defending_cargo_pod: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_type: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_stats_definition: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    attacker_combat_xp: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    attacker_council_rank_xp: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    defender_combat_xp: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    defender_council_rank_xp: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    combat_xp_category: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    council_rank_xp_category: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    combat_xp_modifier: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    council_rank_xp_modifier: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    progression_config: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    combat_config: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    attacking_fleet_ammo_token: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    defending_fleet_ammo_token: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_mint: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    defending_fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    attacking_cargo_pod: Option<&'b solana_account_info::AccountInfo<'a>>,
+    defending_cargo_pod: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_type: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_stats_definition: Option<&'b solana_account_info::AccountInfo<'a>>,
+    attacker_combat_xp: Option<&'b solana_account_info::AccountInfo<'a>>,
+    attacker_council_rank_xp: Option<&'b solana_account_info::AccountInfo<'a>>,
+    defender_combat_xp: Option<&'b solana_account_info::AccountInfo<'a>>,
+    defender_council_rank_xp: Option<&'b solana_account_info::AccountInfo<'a>>,
+    combat_xp_category: Option<&'b solana_account_info::AccountInfo<'a>>,
+    council_rank_xp_category: Option<&'b solana_account_info::AccountInfo<'a>>,
+    combat_xp_modifier: Option<&'b solana_account_info::AccountInfo<'a>>,
+    council_rank_xp_modifier: Option<&'b solana_account_info::AccountInfo<'a>>,
+    progression_config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    combat_config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    attacking_fleet_ammo_token: Option<&'b solana_account_info::AccountInfo<'a>>,
+    defending_fleet_ammo_token: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_mint: Option<&'b solana_account_info::AccountInfo<'a>>,
     key_index: Option<u16>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

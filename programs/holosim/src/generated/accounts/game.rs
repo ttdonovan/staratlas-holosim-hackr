@@ -13,7 +13,7 @@ use crate::generated::types::RiskZonesData;
 use crate::generated::types::Vaults;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Global Game Configuration variables
 
@@ -51,6 +51,8 @@ pub struct Game {
     pub risk_zones: RiskZonesData,
 }
 
+pub const GAME_DISCRIMINATOR: [u8; 8] = [27, 90, 166, 125, 74, 100, 121, 18];
+
 impl Game {
     pub const LEN: usize = 976;
 
@@ -61,12 +63,10 @@ impl Game {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Game {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for Game {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -75,7 +75,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Game {
 #[cfg(feature = "fetch")]
 pub fn fetch_game(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<Game>, std::io::Error> {
     let accounts = fetch_all_game(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -84,7 +84,7 @@ pub fn fetch_game(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_game(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<Game>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -109,7 +109,7 @@ pub fn fetch_all_game(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_game(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<Game>, std::io::Error> {
     let accounts = fetch_all_maybe_game(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -118,7 +118,7 @@ pub fn fetch_maybe_game(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_game(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<Game>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -164,5 +164,5 @@ impl anchor_lang::IdlBuild for Game {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for Game {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

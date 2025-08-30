@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// A `SAGE` player's profile.
 
@@ -33,6 +33,8 @@ pub struct SagePlayerProfile {
     pub bump: u8,
 }
 
+pub const SAGE_PLAYER_PROFILE_DISCRIMINATOR: [u8; 8] = [10, 55, 75, 234, 126, 14, 47, 146];
+
 impl SagePlayerProfile {
     pub const LEN: usize = 74;
 
@@ -43,12 +45,10 @@ impl SagePlayerProfile {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for SagePlayerProfile {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for SagePlayerProfile {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -57,7 +57,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for SagePlayerP
 #[cfg(feature = "fetch")]
 pub fn fetch_sage_player_profile(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<SagePlayerProfile>, std::io::Error> {
     let accounts = fetch_all_sage_player_profile(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -66,7 +66,7 @@ pub fn fetch_sage_player_profile(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_sage_player_profile(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<SagePlayerProfile>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -91,7 +91,7 @@ pub fn fetch_all_sage_player_profile(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_sage_player_profile(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<SagePlayerProfile>, std::io::Error> {
     let accounts = fetch_all_maybe_sage_player_profile(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -100,7 +100,7 @@ pub fn fetch_maybe_sage_player_profile(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_sage_player_profile(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<SagePlayerProfile>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -146,5 +146,5 @@ impl anchor_lang::IdlBuild for SagePlayerProfile {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for SagePlayerProfile {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

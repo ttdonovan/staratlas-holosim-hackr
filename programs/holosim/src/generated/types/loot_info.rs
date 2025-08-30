@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Represents loot at a location
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]

@@ -9,42 +9,44 @@ use crate::generated::types::RepairFleetInput;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const REPAIR_IDLE_FLEET_DISCRIMINATOR: [u8; 8] = [219, 159, 171, 124, 151, 249, 61, 189];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct RepairIdleFleet {
     /// The key on the profile.
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The profile that owns the fleet.
-    pub owning_profile: solana_program::pubkey::Pubkey,
+    pub owning_profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: solana_program::pubkey::Pubkey,
+    pub owning_profile_faction: solana_pubkey::Pubkey,
     /// The fleet.
-    pub fleet: solana_program::pubkey::Pubkey,
+    pub fleet: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The fleet being repaired
-    pub repaired_fleet: solana_program::pubkey::Pubkey,
+    pub repaired_fleet: solana_pubkey::Pubkey,
     /// The fleet cargo hold
-    pub cargo_hold: solana_program::pubkey::Pubkey,
+    pub cargo_hold: solana_pubkey::Pubkey,
     /// The cargo type account for toolkits
-    pub cargo_type: solana_program::pubkey::Pubkey,
+    pub cargo_type: solana_pubkey::Pubkey,
     /// The cargo stats definition account
-    pub stats_definition: solana_program::pubkey::Pubkey,
+    pub stats_definition: solana_pubkey::Pubkey,
     /// The fleet's toolkit token account - owned by the `cargo_hold`
-    pub token_from: solana_program::pubkey::Pubkey,
+    pub token_from: solana_pubkey::Pubkey,
     /// Token Mint - The toolkit mint
-    pub token_mint: solana_program::pubkey::Pubkey,
+    pub token_mint: solana_pubkey::Pubkey,
     /// The Cargo Program
-    pub cargo_program: solana_program::pubkey::Pubkey,
+    pub cargo_program: solana_pubkey::Pubkey,
     /// Token Program
-    pub token_program: solana_program::pubkey::Pubkey,
+    pub token_program: solana_pubkey::Pubkey,
 }
 
 impl RepairIdleFleet {
     pub fn instruction(
         &self,
         args: RepairIdleFleetInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -52,56 +54,45 @@ impl RepairIdleFleet {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: RepairIdleFleetInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(13 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.fleet, false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.fleet, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.repaired_fleet,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.cargo_hold,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.cargo_hold, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_type,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.stats_definition,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.token_from,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.token_mint,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.token_from, false));
+        accounts.push(solana_instruction::AccountMeta::new(self.token_mint, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.token_program,
             false,
         ));
@@ -110,7 +101,7 @@ impl RepairIdleFleet {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -163,21 +154,21 @@ pub struct RepairIdleFleetInstructionArgs {
 ///   12. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
 #[derive(Clone, Debug, Default)]
 pub struct RepairIdleFleetBuilder {
-    key: Option<solana_program::pubkey::Pubkey>,
-    owning_profile: Option<solana_program::pubkey::Pubkey>,
-    owning_profile_faction: Option<solana_program::pubkey::Pubkey>,
-    fleet: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    repaired_fleet: Option<solana_program::pubkey::Pubkey>,
-    cargo_hold: Option<solana_program::pubkey::Pubkey>,
-    cargo_type: Option<solana_program::pubkey::Pubkey>,
-    stats_definition: Option<solana_program::pubkey::Pubkey>,
-    token_from: Option<solana_program::pubkey::Pubkey>,
-    token_mint: Option<solana_program::pubkey::Pubkey>,
-    cargo_program: Option<solana_program::pubkey::Pubkey>,
-    token_program: Option<solana_program::pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    owning_profile: Option<solana_pubkey::Pubkey>,
+    owning_profile_faction: Option<solana_pubkey::Pubkey>,
+    fleet: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    repaired_fleet: Option<solana_pubkey::Pubkey>,
+    cargo_hold: Option<solana_pubkey::Pubkey>,
+    cargo_type: Option<solana_pubkey::Pubkey>,
+    stats_definition: Option<solana_pubkey::Pubkey>,
+    token_from: Option<solana_pubkey::Pubkey>,
+    token_mint: Option<solana_pubkey::Pubkey>,
+    cargo_program: Option<solana_pubkey::Pubkey>,
+    token_program: Option<solana_pubkey::Pubkey>,
     input: Option<RepairFleetInput>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl RepairIdleFleetBuilder {
@@ -186,13 +177,13 @@ impl RepairIdleFleetBuilder {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The profile that owns the fleet.
     #[inline(always)]
-    pub fn owning_profile(&mut self, owning_profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn owning_profile(&mut self, owning_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.owning_profile = Some(owning_profile);
         self
     }
@@ -200,72 +191,69 @@ impl RepairIdleFleetBuilder {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: solana_program::pubkey::Pubkey,
+        owning_profile_faction: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fleet(&mut self, fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The fleet being repaired
     #[inline(always)]
-    pub fn repaired_fleet(&mut self, repaired_fleet: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn repaired_fleet(&mut self, repaired_fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.repaired_fleet = Some(repaired_fleet);
         self
     }
     /// The fleet cargo hold
     #[inline(always)]
-    pub fn cargo_hold(&mut self, cargo_hold: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_hold(&mut self, cargo_hold: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_hold = Some(cargo_hold);
         self
     }
     /// The cargo type account for toolkits
     #[inline(always)]
-    pub fn cargo_type(&mut self, cargo_type: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_type(&mut self, cargo_type: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_type = Some(cargo_type);
         self
     }
     /// The cargo stats definition account
     #[inline(always)]
-    pub fn stats_definition(
-        &mut self,
-        stats_definition: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn stats_definition(&mut self, stats_definition: solana_pubkey::Pubkey) -> &mut Self {
         self.stats_definition = Some(stats_definition);
         self
     }
     /// The fleet's toolkit token account - owned by the `cargo_hold`
     #[inline(always)]
-    pub fn token_from(&mut self, token_from: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_from(&mut self, token_from: solana_pubkey::Pubkey) -> &mut Self {
         self.token_from = Some(token_from);
         self
     }
     /// Token Mint - The toolkit mint
     #[inline(always)]
-    pub fn token_mint(&mut self, token_mint: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_mint(&mut self, token_mint: solana_pubkey::Pubkey) -> &mut Self {
         self.token_mint = Some(token_mint);
         self
     }
     /// The Cargo Program
     #[inline(always)]
-    pub fn cargo_program(&mut self, cargo_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_program(&mut self, cargo_program: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_program = Some(cargo_program);
         self
     }
     /// `[optional account, default to 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA']`
     /// Token Program
     #[inline(always)]
-    pub fn token_program(&mut self, token_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_program(&mut self, token_program: solana_pubkey::Pubkey) -> &mut Self {
         self.token_program = Some(token_program);
         self
     }
@@ -276,10 +264,7 @@ impl RepairIdleFleetBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -287,13 +272,13 @@ impl RepairIdleFleetBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = RepairIdleFleet {
             key: self.key.expect("key is not set"),
             owning_profile: self.owning_profile.expect("owning_profile is not set"),
@@ -309,7 +294,7 @@ impl RepairIdleFleetBuilder {
             token_from: self.token_from.expect("token_from is not set"),
             token_mint: self.token_mint.expect("token_mint is not set"),
             cargo_program: self.cargo_program.expect("cargo_program is not set"),
-            token_program: self.token_program.unwrap_or(solana_program::pubkey!(
+            token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!(
                 "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             )),
         };
@@ -324,70 +309,70 @@ impl RepairIdleFleetBuilder {
 /// `repair_idle_fleet` CPI accounts.
 pub struct RepairIdleFleetCpiAccounts<'a, 'b> {
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet being repaired
-    pub repaired_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub repaired_fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet cargo hold
-    pub cargo_hold: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_hold: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type account for toolkits
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo stats definition account
-    pub stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+    pub stats_definition: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet's toolkit token account - owned by the `cargo_hold`
-    pub token_from: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_from: &'b solana_account_info::AccountInfo<'a>,
     /// Token Mint - The toolkit mint
-    pub token_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_mint: &'b solana_account_info::AccountInfo<'a>,
     /// The Cargo Program
-    pub cargo_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_program: &'b solana_account_info::AccountInfo<'a>,
     /// Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `repair_idle_fleet` CPI instruction.
 pub struct RepairIdleFleetCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet being repaired
-    pub repaired_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub repaired_fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet cargo hold
-    pub cargo_hold: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_hold: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type account for toolkits
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo stats definition account
-    pub stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+    pub stats_definition: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet's toolkit token account - owned by the `cargo_hold`
-    pub token_from: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_from: &'b solana_account_info::AccountInfo<'a>,
     /// Token Mint - The toolkit mint
-    pub token_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_mint: &'b solana_account_info::AccountInfo<'a>,
     /// The Cargo Program
-    pub cargo_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_program: &'b solana_account_info::AccountInfo<'a>,
     /// Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: RepairIdleFleetInstructionArgs,
 }
 
 impl<'a, 'b> RepairIdleFleetCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: RepairIdleFleetCpiAccounts<'a, 'b>,
         args: RepairIdleFleetInstructionArgs,
     ) -> Self {
@@ -410,25 +395,18 @@ impl<'a, 'b> RepairIdleFleetCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -437,67 +415,60 @@ impl<'a, 'b> RepairIdleFleetCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(13 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.fleet.key,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(*self.fleet.key, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.repaired_fleet.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.cargo_hold.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_type.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.stats_definition.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.token_from.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.token_mint.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.token_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -507,7 +478,7 @@ impl<'a, 'b> RepairIdleFleetCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -532,9 +503,9 @@ impl<'a, 'b> RepairIdleFleetCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -562,7 +533,7 @@ pub struct RepairIdleFleetCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(RepairIdleFleetCpiBuilderInstruction {
             __program: program,
             key: None,
@@ -585,7 +556,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
@@ -593,7 +564,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile(
         &mut self,
-        owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile = Some(owning_profile);
         self
@@ -602,23 +573,20 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn fleet(&mut self, fleet: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -626,7 +594,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn repaired_fleet(
         &mut self,
-        repaired_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+        repaired_fleet: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.repaired_fleet = Some(repaired_fleet);
         self
@@ -635,7 +603,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_hold(
         &mut self,
-        cargo_hold: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_hold: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_hold = Some(cargo_hold);
         self
@@ -644,7 +612,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_type(
         &mut self,
-        cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_type: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_type = Some(cargo_type);
         self
@@ -653,7 +621,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn stats_definition(
         &mut self,
-        stats_definition: &'b solana_program::account_info::AccountInfo<'a>,
+        stats_definition: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.stats_definition = Some(stats_definition);
         self
@@ -662,7 +630,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_from(
         &mut self,
-        token_from: &'b solana_program::account_info::AccountInfo<'a>,
+        token_from: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_from = Some(token_from);
         self
@@ -671,7 +639,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_mint(
         &mut self,
-        token_mint: &'b solana_program::account_info::AccountInfo<'a>,
+        token_mint: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_mint = Some(token_mint);
         self
@@ -680,7 +648,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_program(
         &mut self,
-        cargo_program: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_program = Some(cargo_program);
         self
@@ -689,7 +657,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_program(
         &mut self,
-        token_program: &'b solana_program::account_info::AccountInfo<'a>,
+        token_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_program = Some(token_program);
         self
@@ -703,7 +671,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -719,11 +687,7 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -731,15 +695,12 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = RepairIdleFleetInstructionArgs {
             input: self.instruction.input.clone().expect("input is not set"),
         };
@@ -800,25 +761,21 @@ impl<'a, 'b> RepairIdleFleetCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct RepairIdleFleetCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    repaired_fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_hold: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_type: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    stats_definition: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_from: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_mint: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    repaired_fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_hold: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_type: Option<&'b solana_account_info::AccountInfo<'a>>,
+    stats_definition: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_from: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_mint: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     input: Option<RepairFleetInput>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

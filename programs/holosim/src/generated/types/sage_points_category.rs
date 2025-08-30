@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Represents a points category & modifier as defined in the Points program
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]

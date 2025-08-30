@@ -10,7 +10,7 @@ use crate::generated::types::ShipCounts;
 use crate::generated::types::ShipStats;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// A `SAGE` fleet.
 
@@ -97,6 +97,8 @@ pub struct Fleet {
     pub bump: u8,
 }
 
+pub const FLEET_DISCRIMINATOR: [u8; 8] = [109, 207, 251, 48, 106, 2, 136, 163];
+
 impl Fleet {
     pub const LEN: usize = 523;
 
@@ -107,12 +109,10 @@ impl Fleet {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Fleet {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for Fleet {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -121,7 +121,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Fleet {
 #[cfg(feature = "fetch")]
 pub fn fetch_fleet(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<Fleet>, std::io::Error> {
     let accounts = fetch_all_fleet(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -130,7 +130,7 @@ pub fn fetch_fleet(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_fleet(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<Fleet>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -155,7 +155,7 @@ pub fn fetch_all_fleet(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_fleet(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<Fleet>, std::io::Error> {
     let accounts = fetch_all_maybe_fleet(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -164,7 +164,7 @@ pub fn fetch_maybe_fleet(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_fleet(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<Fleet>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -210,5 +210,5 @@ impl anchor_lang::IdlBuild for Fleet {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for Fleet {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

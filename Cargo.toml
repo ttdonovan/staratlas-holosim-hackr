@@ -14,8 +14,13 @@ staratlas-profile-faction = { path = "programs/profile_faction" }
 
 # solana
 solana-account-decoder = "2.2"
+solana-account-info = "2.2"
 solana-client = "2.2"
+solana-cpi = "2.2"
+solana-instruction = "2.2"
 solana-program = "2.2"
+solana-program-error = "2.2"
+solana-pubkey = "2.2"
 solana-sdk = "2.2"
 
 # other
