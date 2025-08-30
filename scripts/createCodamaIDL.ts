@@ -6,7 +6,7 @@ import {
   type ProgramUpdates,
 } from "codama";
 
-import anchorIdl from "../programs/holosim/SAgeTraQfBMdvGVDJYoEvjnbq5szW7RJPi6obDTDQUF-idl.json";
+import anchorIdl from "../programs/holosim/SAgEeT8u14TE69JXtanGSgNkEdoPUcLabeyZD2uw8x9-idl.json";
 // import anchorIdl from "../programs/player_profile/player_profile.json";
 // import anchorIdl from "../programs/profile_faction/profile_faction.json";
 

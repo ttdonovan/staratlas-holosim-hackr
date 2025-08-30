@@ -8,87 +8,86 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const CREATE_CERTIFICATE_MINT_DISCRIMINATOR: [u8; 8] = [173, 190, 45, 116, 34, 109, 34, 89];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct CreateCertificateMint {
     /// The funder for the new crafting process
-    pub funder: solana_program::pubkey::Pubkey,
+    pub funder: solana_pubkey::Pubkey,
     /// The Starbase to create a certificate mint for
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The mint to create a certificate mint for
-    pub cargo_mint: solana_program::pubkey::Pubkey,
+    pub cargo_mint: solana_pubkey::Pubkey,
     /// The new certificate mint
-    pub certificate_mint: solana_program::pubkey::Pubkey,
+    pub certificate_mint: solana_pubkey::Pubkey,
     /// The cargo type to associate with the `cargo_mint`
     /// Included to ensure that this instruction can only be called for valid cargo types
-    pub cargo_type: solana_program::pubkey::Pubkey,
+    pub cargo_type: solana_pubkey::Pubkey,
     /// The game account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The transfer hook extra accounts list
-    pub transfer_hook_extra_account_meta_list: solana_program::pubkey::Pubkey,
+    pub transfer_hook_extra_account_meta_list: solana_pubkey::Pubkey,
     /// The transfer hook program
-    pub transfer_hook_program: solana_program::pubkey::Pubkey,
+    pub transfer_hook_program: solana_pubkey::Pubkey,
     /// The token 2022 program
-    pub token2022_program: solana_program::pubkey::Pubkey,
+    pub token2022_program: solana_pubkey::Pubkey,
     /// The system program
-    pub system_program: solana_program::pubkey::Pubkey,
+    pub system_program: solana_pubkey::Pubkey,
 }
 
 impl CreateCertificateMint {
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
     #[allow(clippy::arithmetic_side_effects)]
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(10 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.funder,
-            true,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.funder, true));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_mint,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.certificate_mint,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_type,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.transfer_hook_extra_account_meta_list,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.transfer_hook_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.token2022_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
         let data = borsh::to_vec(&CreateCertificateMintInstructionData::new()).unwrap();
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -132,17 +131,17 @@ impl Default for CreateCertificateMintInstructionData {
 ///   9. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct CreateCertificateMintBuilder {
-    funder: Option<solana_program::pubkey::Pubkey>,
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    cargo_mint: Option<solana_program::pubkey::Pubkey>,
-    certificate_mint: Option<solana_program::pubkey::Pubkey>,
-    cargo_type: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    transfer_hook_extra_account_meta_list: Option<solana_program::pubkey::Pubkey>,
-    transfer_hook_program: Option<solana_program::pubkey::Pubkey>,
-    token2022_program: Option<solana_program::pubkey::Pubkey>,
-    system_program: Option<solana_program::pubkey::Pubkey>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    funder: Option<solana_pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    cargo_mint: Option<solana_pubkey::Pubkey>,
+    certificate_mint: Option<solana_pubkey::Pubkey>,
+    cargo_type: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    transfer_hook_extra_account_meta_list: Option<solana_pubkey::Pubkey>,
+    transfer_hook_program: Option<solana_pubkey::Pubkey>,
+    token2022_program: Option<solana_pubkey::Pubkey>,
+    system_program: Option<solana_pubkey::Pubkey>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl CreateCertificateMintBuilder {
@@ -151,41 +150,38 @@ impl CreateCertificateMintBuilder {
     }
     /// The funder for the new crafting process
     #[inline(always)]
-    pub fn funder(&mut self, funder: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn funder(&mut self, funder: solana_pubkey::Pubkey) -> &mut Self {
         self.funder = Some(funder);
         self
     }
     /// The Starbase to create a certificate mint for
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The mint to create a certificate mint for
     #[inline(always)]
-    pub fn cargo_mint(&mut self, cargo_mint: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_mint(&mut self, cargo_mint: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_mint = Some(cargo_mint);
         self
     }
     /// The new certificate mint
     #[inline(always)]
-    pub fn certificate_mint(
-        &mut self,
-        certificate_mint: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn certificate_mint(&mut self, certificate_mint: solana_pubkey::Pubkey) -> &mut Self {
         self.certificate_mint = Some(certificate_mint);
         self
     }
     /// The cargo type to associate with the `cargo_mint`
     /// Included to ensure that this instruction can only be called for valid cargo types
     #[inline(always)]
-    pub fn cargo_type(&mut self, cargo_type: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_type(&mut self, cargo_type: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_type = Some(cargo_type);
         self
     }
     /// The game account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
@@ -193,7 +189,7 @@ impl CreateCertificateMintBuilder {
     #[inline(always)]
     pub fn transfer_hook_extra_account_meta_list(
         &mut self,
-        transfer_hook_extra_account_meta_list: solana_program::pubkey::Pubkey,
+        transfer_hook_extra_account_meta_list: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.transfer_hook_extra_account_meta_list = Some(transfer_hook_extra_account_meta_list);
         self
@@ -202,33 +198,27 @@ impl CreateCertificateMintBuilder {
     #[inline(always)]
     pub fn transfer_hook_program(
         &mut self,
-        transfer_hook_program: solana_program::pubkey::Pubkey,
+        transfer_hook_program: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.transfer_hook_program = Some(transfer_hook_program);
         self
     }
     /// The token 2022 program
     #[inline(always)]
-    pub fn token2022_program(
-        &mut self,
-        token2022_program: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn token2022_program(&mut self, token2022_program: solana_pubkey::Pubkey) -> &mut Self {
         self.token2022_program = Some(token2022_program);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
     /// The system program
     #[inline(always)]
-    pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
         self
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -236,13 +226,13 @@ impl CreateCertificateMintBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = CreateCertificateMint {
             funder: self.funder.expect("funder is not set"),
             starbase: self.starbase.expect("starbase is not set"),
@@ -261,7 +251,7 @@ impl CreateCertificateMintBuilder {
                 .expect("token2022_program is not set"),
             system_program: self
                 .system_program
-                .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+                .unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
         };
 
         accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
@@ -271,58 +261,58 @@ impl CreateCertificateMintBuilder {
 /// `create_certificate_mint` CPI accounts.
 pub struct CreateCertificateMintCpiAccounts<'a, 'b> {
     /// The funder for the new crafting process
-    pub funder: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funder: &'b solana_account_info::AccountInfo<'a>,
     /// The Starbase to create a certificate mint for
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The mint to create a certificate mint for
-    pub cargo_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_mint: &'b solana_account_info::AccountInfo<'a>,
     /// The new certificate mint
-    pub certificate_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub certificate_mint: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type to associate with the `cargo_mint`
     /// Included to ensure that this instruction can only be called for valid cargo types
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The game account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The transfer hook extra accounts list
-    pub transfer_hook_extra_account_meta_list: &'b solana_program::account_info::AccountInfo<'a>,
+    pub transfer_hook_extra_account_meta_list: &'b solana_account_info::AccountInfo<'a>,
     /// The transfer hook program
-    pub transfer_hook_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub transfer_hook_program: &'b solana_account_info::AccountInfo<'a>,
     /// The token 2022 program
-    pub token2022_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token2022_program: &'b solana_account_info::AccountInfo<'a>,
     /// The system program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `create_certificate_mint` CPI instruction.
 pub struct CreateCertificateMintCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The funder for the new crafting process
-    pub funder: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funder: &'b solana_account_info::AccountInfo<'a>,
     /// The Starbase to create a certificate mint for
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The mint to create a certificate mint for
-    pub cargo_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_mint: &'b solana_account_info::AccountInfo<'a>,
     /// The new certificate mint
-    pub certificate_mint: &'b solana_program::account_info::AccountInfo<'a>,
+    pub certificate_mint: &'b solana_account_info::AccountInfo<'a>,
     /// The cargo type to associate with the `cargo_mint`
     /// Included to ensure that this instruction can only be called for valid cargo types
-    pub cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_type: &'b solana_account_info::AccountInfo<'a>,
     /// The game account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The transfer hook extra accounts list
-    pub transfer_hook_extra_account_meta_list: &'b solana_program::account_info::AccountInfo<'a>,
+    pub transfer_hook_extra_account_meta_list: &'b solana_account_info::AccountInfo<'a>,
     /// The transfer hook program
-    pub transfer_hook_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub transfer_hook_program: &'b solana_account_info::AccountInfo<'a>,
     /// The token 2022 program
-    pub token2022_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token2022_program: &'b solana_account_info::AccountInfo<'a>,
     /// The system program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 impl<'a, 'b> CreateCertificateMintCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: CreateCertificateMintCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
@@ -340,25 +330,18 @@ impl<'a, 'b> CreateCertificateMintCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -367,55 +350,48 @@ impl<'a, 'b> CreateCertificateMintCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(10 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.funder.key,
-            true,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(*self.funder.key, true));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_mint.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.certificate_mint.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_type.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.transfer_hook_extra_account_meta_list.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.transfer_hook_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.token2022_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -423,7 +399,7 @@ impl<'a, 'b> CreateCertificateMintCpi<'a, 'b> {
         });
         let data = borsh::to_vec(&CreateCertificateMintInstructionData::new()).unwrap();
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -445,9 +421,9 @@ impl<'a, 'b> CreateCertificateMintCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -472,7 +448,7 @@ pub struct CreateCertificateMintCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(CreateCertificateMintCpiBuilderInstruction {
             __program: program,
             funder: None,
@@ -491,19 +467,13 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     }
     /// The funder for the new crafting process
     #[inline(always)]
-    pub fn funder(
-        &mut self,
-        funder: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn funder(&mut self, funder: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.funder = Some(funder);
         self
     }
     /// The Starbase to create a certificate mint for
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -511,7 +481,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_mint(
         &mut self,
-        cargo_mint: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_mint: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_mint = Some(cargo_mint);
         self
@@ -520,7 +490,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn certificate_mint(
         &mut self,
-        certificate_mint: &'b solana_program::account_info::AccountInfo<'a>,
+        certificate_mint: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.certificate_mint = Some(certificate_mint);
         self
@@ -530,17 +500,14 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_type(
         &mut self,
-        cargo_type: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_type: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_type = Some(cargo_type);
         self
     }
     /// The game account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -548,7 +515,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn transfer_hook_extra_account_meta_list(
         &mut self,
-        transfer_hook_extra_account_meta_list: &'b solana_program::account_info::AccountInfo<'a>,
+        transfer_hook_extra_account_meta_list: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.transfer_hook_extra_account_meta_list =
             Some(transfer_hook_extra_account_meta_list);
@@ -558,7 +525,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn transfer_hook_program(
         &mut self,
-        transfer_hook_program: &'b solana_program::account_info::AccountInfo<'a>,
+        transfer_hook_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.transfer_hook_program = Some(transfer_hook_program);
         self
@@ -567,7 +534,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token2022_program(
         &mut self,
-        token2022_program: &'b solana_program::account_info::AccountInfo<'a>,
+        token2022_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token2022_program = Some(token2022_program);
         self
@@ -576,7 +543,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn system_program(
         &mut self,
-        system_program: &'b solana_program::account_info::AccountInfo<'a>,
+        system_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
         self
@@ -585,7 +552,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -601,11 +568,7 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -613,15 +576,12 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let instruction = CreateCertificateMintCpi {
             __program: self.instruction.__program,
 
@@ -669,22 +629,17 @@ impl<'a, 'b> CreateCertificateMintCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct CreateCertificateMintCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    funder: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_mint: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    certificate_mint: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_type: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    transfer_hook_extra_account_meta_list:
-        Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    transfer_hook_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token2022_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    funder: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_mint: Option<&'b solana_account_info::AccountInfo<'a>>,
+    certificate_mint: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_type: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    transfer_hook_extra_account_meta_list: Option<&'b solana_account_info::AccountInfo<'a>>,
+    transfer_hook_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token2022_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

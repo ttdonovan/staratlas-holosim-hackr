@@ -9,30 +9,32 @@ use crate::generated::types::KeyIndexInput;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const DEREGISTER_RESOURCE_DISCRIMINATOR: [u8; 8] = [57, 140, 148, 246, 8, 89, 23, 34];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct DeregisterResource {
     /// The key authorized for this instruction
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The [`Profile`] account
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// Where the closing funds go.
-    pub funds_to: solana_program::pubkey::Pubkey,
+    pub funds_to: solana_pubkey::Pubkey,
     /// The [`MineItem`] account
-    pub mine_item: solana_program::pubkey::Pubkey,
+    pub mine_item: solana_pubkey::Pubkey,
     /// The [`Resource`] account
-    pub resource: solana_program::pubkey::Pubkey,
+    pub resource: solana_pubkey::Pubkey,
     /// The Location address
-    pub location: solana_program::pubkey::Pubkey,
+    pub location: solana_pubkey::Pubkey,
 }
 
 impl DeregisterResource {
     pub fn instruction(
         &self,
         args: DeregisterResourceInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -40,42 +42,30 @@ impl DeregisterResource {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: DeregisterResourceInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(7 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.funds_to,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.mine_item,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.resource,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.location,
-            false,
-        ));
+        accounts.push(solana_instruction::AccountMeta::new(self.funds_to, false));
+        accounts.push(solana_instruction::AccountMeta::new(self.mine_item, false));
+        accounts.push(solana_instruction::AccountMeta::new(self.resource, false));
+        accounts.push(solana_instruction::AccountMeta::new(self.location, false));
         accounts.extend_from_slice(remaining_accounts);
         let mut data = borsh::to_vec(&DeregisterResourceInstructionData::new()).unwrap();
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -122,15 +112,15 @@ pub struct DeregisterResourceInstructionArgs {
 ///   6. `[writable]` location
 #[derive(Clone, Debug, Default)]
 pub struct DeregisterResourceBuilder {
-    key: Option<solana_program::pubkey::Pubkey>,
-    profile: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    funds_to: Option<solana_program::pubkey::Pubkey>,
-    mine_item: Option<solana_program::pubkey::Pubkey>,
-    resource: Option<solana_program::pubkey::Pubkey>,
-    location: Option<solana_program::pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    profile: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    funds_to: Option<solana_pubkey::Pubkey>,
+    mine_item: Option<solana_pubkey::Pubkey>,
+    resource: Option<solana_pubkey::Pubkey>,
+    location: Option<solana_pubkey::Pubkey>,
     input: Option<KeyIndexInput>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl DeregisterResourceBuilder {
@@ -139,43 +129,43 @@ impl DeregisterResourceBuilder {
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// Where the closing funds go.
     #[inline(always)]
-    pub fn funds_to(&mut self, funds_to: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn funds_to(&mut self, funds_to: solana_pubkey::Pubkey) -> &mut Self {
         self.funds_to = Some(funds_to);
         self
     }
     /// The [`MineItem`] account
     #[inline(always)]
-    pub fn mine_item(&mut self, mine_item: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn mine_item(&mut self, mine_item: solana_pubkey::Pubkey) -> &mut Self {
         self.mine_item = Some(mine_item);
         self
     }
     /// The [`Resource`] account
     #[inline(always)]
-    pub fn resource(&mut self, resource: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn resource(&mut self, resource: solana_pubkey::Pubkey) -> &mut Self {
         self.resource = Some(resource);
         self
     }
     /// The Location address
     #[inline(always)]
-    pub fn location(&mut self, location: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn location(&mut self, location: solana_pubkey::Pubkey) -> &mut Self {
         self.location = Some(location);
         self
     }
@@ -186,10 +176,7 @@ impl DeregisterResourceBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -197,13 +184,13 @@ impl DeregisterResourceBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = DeregisterResource {
             key: self.key.expect("key is not set"),
             profile: self.profile.expect("profile is not set"),
@@ -224,46 +211,46 @@ impl DeregisterResourceBuilder {
 /// `deregister_resource` CPI accounts.
 pub struct DeregisterResourceCpiAccounts<'a, 'b> {
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// Where the closing funds go.
-    pub funds_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funds_to: &'b solana_account_info::AccountInfo<'a>,
     /// The [`MineItem`] account
-    pub mine_item: &'b solana_program::account_info::AccountInfo<'a>,
+    pub mine_item: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Resource`] account
-    pub resource: &'b solana_program::account_info::AccountInfo<'a>,
+    pub resource: &'b solana_account_info::AccountInfo<'a>,
     /// The Location address
-    pub location: &'b solana_program::account_info::AccountInfo<'a>,
+    pub location: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `deregister_resource` CPI instruction.
 pub struct DeregisterResourceCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// Where the closing funds go.
-    pub funds_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funds_to: &'b solana_account_info::AccountInfo<'a>,
     /// The [`MineItem`] account
-    pub mine_item: &'b solana_program::account_info::AccountInfo<'a>,
+    pub mine_item: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Resource`] account
-    pub resource: &'b solana_program::account_info::AccountInfo<'a>,
+    pub resource: &'b solana_account_info::AccountInfo<'a>,
     /// The Location address
-    pub location: &'b solana_program::account_info::AccountInfo<'a>,
+    pub location: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: DeregisterResourceInstructionArgs,
 }
 
 impl<'a, 'b> DeregisterResourceCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: DeregisterResourceCpiAccounts<'a, 'b>,
         args: DeregisterResourceInstructionArgs,
     ) -> Self {
@@ -280,25 +267,18 @@ impl<'a, 'b> DeregisterResourceCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -307,43 +287,39 @@ impl<'a, 'b> DeregisterResourceCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(7 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.funds_to.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.mine_item.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.resource.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.location.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -353,7 +329,7 @@ impl<'a, 'b> DeregisterResourceCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -372,9 +348,9 @@ impl<'a, 'b> DeregisterResourceCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -396,7 +372,7 @@ pub struct DeregisterResourceCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> DeregisterResourceCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(DeregisterResourceCpiBuilderInstruction {
             __program: program,
             key: None,
@@ -413,61 +389,43 @@ impl<'a, 'b> DeregisterResourceCpiBuilder<'a, 'b> {
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
     /// Where the closing funds go.
     #[inline(always)]
-    pub fn funds_to(
-        &mut self,
-        funds_to: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn funds_to(&mut self, funds_to: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.funds_to = Some(funds_to);
         self
     }
     /// The [`MineItem`] account
     #[inline(always)]
-    pub fn mine_item(
-        &mut self,
-        mine_item: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn mine_item(&mut self, mine_item: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.mine_item = Some(mine_item);
         self
     }
     /// The [`Resource`] account
     #[inline(always)]
-    pub fn resource(
-        &mut self,
-        resource: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn resource(&mut self, resource: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.resource = Some(resource);
         self
     }
     /// The Location address
     #[inline(always)]
-    pub fn location(
-        &mut self,
-        location: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn location(&mut self, location: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.location = Some(location);
         self
     }
@@ -480,7 +438,7 @@ impl<'a, 'b> DeregisterResourceCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -496,11 +454,7 @@ impl<'a, 'b> DeregisterResourceCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -508,15 +462,12 @@ impl<'a, 'b> DeregisterResourceCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = DeregisterResourceInstructionArgs {
             input: self.instruction.input.clone().expect("input is not set"),
         };
@@ -547,19 +498,15 @@ impl<'a, 'b> DeregisterResourceCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct DeregisterResourceCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    funds_to: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    mine_item: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    resource: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    location: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    funds_to: Option<&'b solana_account_info::AccountInfo<'a>>,
+    mine_item: Option<&'b solana_account_info::AccountInfo<'a>>,
+    resource: Option<&'b solana_account_info::AccountInfo<'a>>,
+    location: Option<&'b solana_account_info::AccountInfo<'a>>,
     input: Option<KeyIndexInput>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

@@ -9,7 +9,7 @@ use crate::generated::types::OptionalNonSystemPubkey;
 use crate::generated::types::ShipStats;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// This account represents a Ship
 
@@ -46,6 +46,8 @@ pub struct Ship {
     pub next: OptionalNonSystemPubkey,
 }
 
+pub const SHIP_DISCRIMINATOR: [u8; 8] = [114, 41, 245, 232, 24, 58, 234, 158];
+
 impl Ship {
     pub const LEN: usize = 322;
 
@@ -56,12 +58,10 @@ impl Ship {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Ship {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for Ship {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -70,7 +70,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Ship {
 #[cfg(feature = "fetch")]
 pub fn fetch_ship(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<Ship>, std::io::Error> {
     let accounts = fetch_all_ship(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -79,7 +79,7 @@ pub fn fetch_ship(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_ship(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<Ship>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -104,7 +104,7 @@ pub fn fetch_all_ship(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_ship(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<Ship>, std::io::Error> {
     let accounts = fetch_all_maybe_ship(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -113,7 +113,7 @@ pub fn fetch_maybe_ship(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_ship(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<Ship>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -159,5 +159,5 @@ impl anchor_lang::IdlBuild for Ship {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for Ship {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

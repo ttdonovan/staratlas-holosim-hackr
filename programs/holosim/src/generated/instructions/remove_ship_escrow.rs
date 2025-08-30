@@ -9,44 +9,46 @@ use crate::generated::types::RemoveShipEscrowInput;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const REMOVE_SHIP_ESCROW_DISCRIMINATOR: [u8; 8] = [67, 4, 108, 161, 186, 106, 125, 52];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct RemoveShipEscrow {
     /// The key authorized for this instruction
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The [`Profile`] account
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub profile_faction: solana_program::pubkey::Pubkey,
+    pub profile_faction: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The [`GameState`] account
-    pub game_state: solana_program::pubkey::Pubkey,
+    pub game_state: solana_pubkey::Pubkey,
     /// The funds_to - receives rent refund
-    pub funds_to: solana_program::pubkey::Pubkey,
+    pub funds_to: solana_pubkey::Pubkey,
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: solana_program::pubkey::Pubkey,
+    pub sage_player_profile: solana_pubkey::Pubkey,
     /// The Destination Token Account
-    pub destination_token_account: solana_program::pubkey::Pubkey,
+    pub destination_token_account: solana_pubkey::Pubkey,
     /// The [`Ship`] Account
-    pub ship: solana_program::pubkey::Pubkey,
+    pub ship: solana_pubkey::Pubkey,
     /// The Escrow Token Account
-    pub ship_escrow_token_account: solana_program::pubkey::Pubkey,
+    pub ship_escrow_token_account: solana_pubkey::Pubkey,
     /// The [`Starbase`] account
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: solana_program::pubkey::Pubkey,
+    pub starbase_player: solana_pubkey::Pubkey,
     /// The Token Program
-    pub token_program: solana_program::pubkey::Pubkey,
+    pub token_program: solana_pubkey::Pubkey,
     /// The Solana System program
-    pub system_program: solana_program::pubkey::Pubkey,
+    pub system_program: solana_pubkey::Pubkey,
 }
 
 impl RemoveShipEscrow {
     pub fn instruction(
         &self,
         args: RemoveShipEscrowInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -54,60 +56,57 @@ impl RemoveShipEscrow {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: RemoveShipEscrowInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(14 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_state,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.funds_to,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(self.funds_to, false));
+        accounts.push(solana_instruction::AccountMeta::new(
             self.sage_player_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.destination_token_account,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.ship, false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.ship_escrow_token_account,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.starbase_player,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.token_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
@@ -116,7 +115,7 @@ impl RemoveShipEscrow {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -170,22 +169,22 @@ pub struct RemoveShipEscrowInstructionArgs {
 ///   13. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct RemoveShipEscrowBuilder {
-    key: Option<solana_program::pubkey::Pubkey>,
-    profile: Option<solana_program::pubkey::Pubkey>,
-    profile_faction: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    game_state: Option<solana_program::pubkey::Pubkey>,
-    funds_to: Option<solana_program::pubkey::Pubkey>,
-    sage_player_profile: Option<solana_program::pubkey::Pubkey>,
-    destination_token_account: Option<solana_program::pubkey::Pubkey>,
-    ship: Option<solana_program::pubkey::Pubkey>,
-    ship_escrow_token_account: Option<solana_program::pubkey::Pubkey>,
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    starbase_player: Option<solana_program::pubkey::Pubkey>,
-    token_program: Option<solana_program::pubkey::Pubkey>,
-    system_program: Option<solana_program::pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    profile: Option<solana_pubkey::Pubkey>,
+    profile_faction: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    game_state: Option<solana_pubkey::Pubkey>,
+    funds_to: Option<solana_pubkey::Pubkey>,
+    sage_player_profile: Option<solana_pubkey::Pubkey>,
+    destination_token_account: Option<solana_pubkey::Pubkey>,
+    ship: Option<solana_pubkey::Pubkey>,
+    ship_escrow_token_account: Option<solana_pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    starbase_player: Option<solana_pubkey::Pubkey>,
+    token_program: Option<solana_pubkey::Pubkey>,
+    system_program: Option<solana_pubkey::Pubkey>,
     input: Option<RemoveShipEscrowInput>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl RemoveShipEscrowBuilder {
@@ -194,49 +193,43 @@ impl RemoveShipEscrowBuilder {
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The faction that the profile belongs to.
     #[inline(always)]
-    pub fn profile_faction(
-        &mut self,
-        profile_faction: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn profile_faction(&mut self, profile_faction: solana_pubkey::Pubkey) -> &mut Self {
         self.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The [`GameState`] account
     #[inline(always)]
-    pub fn game_state(&mut self, game_state: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_state(&mut self, game_state: solana_pubkey::Pubkey) -> &mut Self {
         self.game_state = Some(game_state);
         self
     }
     /// The funds_to - receives rent refund
     #[inline(always)]
-    pub fn funds_to(&mut self, funds_to: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn funds_to(&mut self, funds_to: solana_pubkey::Pubkey) -> &mut Self {
         self.funds_to = Some(funds_to);
         self
     }
     /// The [`SagePlayerProfile`] account
     #[inline(always)]
-    pub fn sage_player_profile(
-        &mut self,
-        sage_player_profile: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn sage_player_profile(&mut self, sage_player_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.sage_player_profile = Some(sage_player_profile);
         self
     }
@@ -244,14 +237,14 @@ impl RemoveShipEscrowBuilder {
     #[inline(always)]
     pub fn destination_token_account(
         &mut self,
-        destination_token_account: solana_program::pubkey::Pubkey,
+        destination_token_account: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.destination_token_account = Some(destination_token_account);
         self
     }
     /// The [`Ship`] Account
     #[inline(always)]
-    pub fn ship(&mut self, ship: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn ship(&mut self, ship: solana_pubkey::Pubkey) -> &mut Self {
         self.ship = Some(ship);
         self
     }
@@ -259,37 +252,34 @@ impl RemoveShipEscrowBuilder {
     #[inline(always)]
     pub fn ship_escrow_token_account(
         &mut self,
-        ship_escrow_token_account: solana_program::pubkey::Pubkey,
+        ship_escrow_token_account: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.ship_escrow_token_account = Some(ship_escrow_token_account);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The [`StarbasePlayer`] Account
     #[inline(always)]
-    pub fn starbase_player(
-        &mut self,
-        starbase_player: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn starbase_player(&mut self, starbase_player: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase_player = Some(starbase_player);
         self
     }
     /// `[optional account, default to 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA']`
     /// The Token Program
     #[inline(always)]
-    pub fn token_program(&mut self, token_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_program(&mut self, token_program: solana_pubkey::Pubkey) -> &mut Self {
         self.token_program = Some(token_program);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
     /// The Solana System program
     #[inline(always)]
-    pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
         self
     }
@@ -300,10 +290,7 @@ impl RemoveShipEscrowBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -311,13 +298,13 @@ impl RemoveShipEscrowBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = RemoveShipEscrow {
             key: self.key.expect("key is not set"),
             profile: self.profile.expect("profile is not set"),
@@ -337,12 +324,12 @@ impl RemoveShipEscrowBuilder {
                 .expect("ship_escrow_token_account is not set"),
             starbase: self.starbase.expect("starbase is not set"),
             starbase_player: self.starbase_player.expect("starbase_player is not set"),
-            token_program: self.token_program.unwrap_or(solana_program::pubkey!(
+            token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!(
                 "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             )),
             system_program: self
                 .system_program
-                .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+                .unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
         };
         let args = RemoveShipEscrowInstructionArgs {
             input: self.input.clone().expect("input is not set"),
@@ -355,74 +342,74 @@ impl RemoveShipEscrowBuilder {
 /// `remove_ship_escrow` CPI accounts.
 pub struct RemoveShipEscrowCpiAccounts<'a, 'b> {
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The funds_to - receives rent refund
-    pub funds_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funds_to: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The Destination Token Account
-    pub destination_token_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub destination_token_account: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Ship`] Account
-    pub ship: &'b solana_program::account_info::AccountInfo<'a>,
+    pub ship: &'b solana_account_info::AccountInfo<'a>,
     /// The Escrow Token Account
-    pub ship_escrow_token_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub ship_escrow_token_account: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `remove_ship_escrow` CPI instruction.
 pub struct RemoveShipEscrowCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The funds_to - receives rent refund
-    pub funds_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funds_to: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The Destination Token Account
-    pub destination_token_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub destination_token_account: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Ship`] Account
-    pub ship: &'b solana_program::account_info::AccountInfo<'a>,
+    pub ship: &'b solana_account_info::AccountInfo<'a>,
     /// The Escrow Token Account
-    pub ship_escrow_token_account: &'b solana_program::account_info::AccountInfo<'a>,
+    pub ship_escrow_token_account: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: RemoveShipEscrowInstructionArgs,
 }
 
 impl<'a, 'b> RemoveShipEscrowCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: RemoveShipEscrowCpiAccounts<'a, 'b>,
         args: RemoveShipEscrowInstructionArgs,
     ) -> Self {
@@ -446,25 +433,18 @@ impl<'a, 'b> RemoveShipEscrowCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -473,71 +453,67 @@ impl<'a, 'b> RemoveShipEscrowCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(14 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_state.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.funds_to.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.sage_player_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.destination_token_account.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.ship.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.ship_escrow_token_account.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.starbase_player.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.token_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -547,7 +523,7 @@ impl<'a, 'b> RemoveShipEscrowCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -573,9 +549,9 @@ impl<'a, 'b> RemoveShipEscrowCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -604,7 +580,7 @@ pub struct RemoveShipEscrowCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(RemoveShipEscrowCpiBuilderInstruction {
             __program: program,
             key: None,
@@ -628,16 +604,13 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
@@ -645,17 +618,14 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn profile_faction(
         &mut self,
-        profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -663,17 +633,14 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn game_state(
         &mut self,
-        game_state: &'b solana_program::account_info::AccountInfo<'a>,
+        game_state: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.game_state = Some(game_state);
         self
     }
     /// The funds_to - receives rent refund
     #[inline(always)]
-    pub fn funds_to(
-        &mut self,
-        funds_to: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn funds_to(&mut self, funds_to: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.funds_to = Some(funds_to);
         self
     }
@@ -681,7 +648,7 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn sage_player_profile(
         &mut self,
-        sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.sage_player_profile = Some(sage_player_profile);
         self
@@ -690,14 +657,14 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn destination_token_account(
         &mut self,
-        destination_token_account: &'b solana_program::account_info::AccountInfo<'a>,
+        destination_token_account: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.destination_token_account = Some(destination_token_account);
         self
     }
     /// The [`Ship`] Account
     #[inline(always)]
-    pub fn ship(&mut self, ship: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn ship(&mut self, ship: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.ship = Some(ship);
         self
     }
@@ -705,17 +672,14 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn ship_escrow_token_account(
         &mut self,
-        ship_escrow_token_account: &'b solana_program::account_info::AccountInfo<'a>,
+        ship_escrow_token_account: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.ship_escrow_token_account = Some(ship_escrow_token_account);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -723,7 +687,7 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn starbase_player(
         &mut self,
-        starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+        starbase_player: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.starbase_player = Some(starbase_player);
         self
@@ -732,7 +696,7 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_program(
         &mut self,
-        token_program: &'b solana_program::account_info::AccountInfo<'a>,
+        token_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_program = Some(token_program);
         self
@@ -741,7 +705,7 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn system_program(
         &mut self,
-        system_program: &'b solana_program::account_info::AccountInfo<'a>,
+        system_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
         self
@@ -755,7 +719,7 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -771,11 +735,7 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -783,15 +743,12 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = RemoveShipEscrowInstructionArgs {
             input: self.instruction.input.clone().expect("input is not set"),
         };
@@ -857,26 +814,22 @@ impl<'a, 'b> RemoveShipEscrowCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct RemoveShipEscrowCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_state: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    funds_to: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    sage_player_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    destination_token_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    ship: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    ship_escrow_token_account: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase_player: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_state: Option<&'b solana_account_info::AccountInfo<'a>>,
+    funds_to: Option<&'b solana_account_info::AccountInfo<'a>>,
+    sage_player_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    destination_token_account: Option<&'b solana_account_info::AccountInfo<'a>>,
+    ship: Option<&'b solana_account_info::AccountInfo<'a>>,
+    ship_escrow_token_account: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase_player: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     input: Option<RemoveShipEscrowInput>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

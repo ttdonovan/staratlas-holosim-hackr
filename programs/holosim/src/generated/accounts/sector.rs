@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Sector
 
@@ -52,6 +52,8 @@ pub struct Sector {
     pub num_connections: u16,
 }
 
+pub const SECTOR_DISCRIMINATOR: [u8; 8] = [65, 117, 23, 82, 80, 133, 247, 233];
+
 impl Sector {
     pub const LEN: usize = 176;
 
@@ -62,12 +64,10 @@ impl Sector {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Sector {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for Sector {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -76,7 +76,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Sector {
 #[cfg(feature = "fetch")]
 pub fn fetch_sector(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<Sector>, std::io::Error> {
     let accounts = fetch_all_sector(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -85,7 +85,7 @@ pub fn fetch_sector(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_sector(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<Sector>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -110,7 +110,7 @@ pub fn fetch_all_sector(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_sector(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<Sector>, std::io::Error> {
     let accounts = fetch_all_maybe_sector(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -119,7 +119,7 @@ pub fn fetch_maybe_sector(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_sector(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<Sector>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -165,5 +165,5 @@ impl anchor_lang::IdlBuild for Sector {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for Sector {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

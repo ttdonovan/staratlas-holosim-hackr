@@ -8,36 +8,38 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const RESPAWN_TO_LOADING_BAY_DISCRIMINATOR: [u8; 8] = [105, 196, 139, 238, 13, 70, 125, 226];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct RespawnToLoadingBay {
     /// The key on the profile.
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The profile that owns the fleet.
-    pub owning_profile: solana_program::pubkey::Pubkey,
+    pub owning_profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: solana_program::pubkey::Pubkey,
+    pub owning_profile_faction: solana_pubkey::Pubkey,
     /// The fleet.
-    pub fleet: solana_program::pubkey::Pubkey,
+    pub fleet: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The [`Starbase`] account
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: solana_program::pubkey::Pubkey,
+    pub starbase_player: solana_pubkey::Pubkey,
     /// The fleet `cargo_hold` cargo pod
-    pub cargo_hold: solana_program::pubkey::Pubkey,
+    pub cargo_hold: solana_pubkey::Pubkey,
     /// The fleet `fuel_tank` cargo pod
-    pub fuel_tank: solana_program::pubkey::Pubkey,
+    pub fuel_tank: solana_pubkey::Pubkey,
     /// The fleet `ammo_bank` cargo pod
-    pub ammo_bank: solana_program::pubkey::Pubkey,
+    pub ammo_bank: solana_pubkey::Pubkey,
 }
 
 impl RespawnToLoadingBay {
     pub fn instruction(
         &self,
         args: RespawnToLoadingBayInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -45,44 +47,42 @@ impl RespawnToLoadingBay {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: RespawnToLoadingBayInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(10 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.fleet, false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.fleet, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.starbase_player,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.cargo_hold,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.fuel_tank,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.ammo_bank,
             false,
         ));
@@ -91,7 +91,7 @@ impl RespawnToLoadingBay {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -141,18 +141,18 @@ pub struct RespawnToLoadingBayInstructionArgs {
 ///   9. `[]` ammo_bank
 #[derive(Clone, Debug, Default)]
 pub struct RespawnToLoadingBayBuilder {
-    key: Option<solana_program::pubkey::Pubkey>,
-    owning_profile: Option<solana_program::pubkey::Pubkey>,
-    owning_profile_faction: Option<solana_program::pubkey::Pubkey>,
-    fleet: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    starbase_player: Option<solana_program::pubkey::Pubkey>,
-    cargo_hold: Option<solana_program::pubkey::Pubkey>,
-    fuel_tank: Option<solana_program::pubkey::Pubkey>,
-    ammo_bank: Option<solana_program::pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    owning_profile: Option<solana_pubkey::Pubkey>,
+    owning_profile_faction: Option<solana_pubkey::Pubkey>,
+    fleet: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    starbase_player: Option<solana_pubkey::Pubkey>,
+    cargo_hold: Option<solana_pubkey::Pubkey>,
+    fuel_tank: Option<solana_pubkey::Pubkey>,
+    ammo_bank: Option<solana_pubkey::Pubkey>,
     key_index: Option<u16>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl RespawnToLoadingBayBuilder {
@@ -161,13 +161,13 @@ impl RespawnToLoadingBayBuilder {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The profile that owns the fleet.
     #[inline(always)]
-    pub fn owning_profile(&mut self, owning_profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn owning_profile(&mut self, owning_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.owning_profile = Some(owning_profile);
         self
     }
@@ -175,53 +175,50 @@ impl RespawnToLoadingBayBuilder {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: solana_program::pubkey::Pubkey,
+        owning_profile_faction: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fleet(&mut self, fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The [`StarbasePlayer`] Account
     #[inline(always)]
-    pub fn starbase_player(
-        &mut self,
-        starbase_player: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn starbase_player(&mut self, starbase_player: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase_player = Some(starbase_player);
         self
     }
     /// The fleet `cargo_hold` cargo pod
     #[inline(always)]
-    pub fn cargo_hold(&mut self, cargo_hold: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn cargo_hold(&mut self, cargo_hold: solana_pubkey::Pubkey) -> &mut Self {
         self.cargo_hold = Some(cargo_hold);
         self
     }
     /// The fleet `fuel_tank` cargo pod
     #[inline(always)]
-    pub fn fuel_tank(&mut self, fuel_tank: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fuel_tank(&mut self, fuel_tank: solana_pubkey::Pubkey) -> &mut Self {
         self.fuel_tank = Some(fuel_tank);
         self
     }
     /// The fleet `ammo_bank` cargo pod
     #[inline(always)]
-    pub fn ammo_bank(&mut self, ammo_bank: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn ammo_bank(&mut self, ammo_bank: solana_pubkey::Pubkey) -> &mut Self {
         self.ammo_bank = Some(ammo_bank);
         self
     }
@@ -232,10 +229,7 @@ impl RespawnToLoadingBayBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -243,13 +237,13 @@ impl RespawnToLoadingBayBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = RespawnToLoadingBay {
             key: self.key.expect("key is not set"),
             owning_profile: self.owning_profile.expect("owning_profile is not set"),
@@ -275,58 +269,58 @@ impl RespawnToLoadingBayBuilder {
 /// `respawn_to_loading_bay` CPI accounts.
 pub struct RespawnToLoadingBayCpiAccounts<'a, 'b> {
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet `cargo_hold` cargo pod
-    pub cargo_hold: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_hold: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet `fuel_tank` cargo pod
-    pub fuel_tank: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fuel_tank: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet `ammo_bank` cargo pod
-    pub ammo_bank: &'b solana_program::account_info::AccountInfo<'a>,
+    pub ammo_bank: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `respawn_to_loading_bay` CPI instruction.
 pub struct RespawnToLoadingBayCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet `cargo_hold` cargo pod
-    pub cargo_hold: &'b solana_program::account_info::AccountInfo<'a>,
+    pub cargo_hold: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet `fuel_tank` cargo pod
-    pub fuel_tank: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fuel_tank: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet `ammo_bank` cargo pod
-    pub ammo_bank: &'b solana_program::account_info::AccountInfo<'a>,
+    pub ammo_bank: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: RespawnToLoadingBayInstructionArgs,
 }
 
 impl<'a, 'b> RespawnToLoadingBayCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: RespawnToLoadingBayCpiAccounts<'a, 'b>,
         args: RespawnToLoadingBayInstructionArgs,
     ) -> Self {
@@ -346,25 +340,18 @@ impl<'a, 'b> RespawnToLoadingBayCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -373,55 +360,48 @@ impl<'a, 'b> RespawnToLoadingBayCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(10 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.fleet.key,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(*self.fleet.key, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.starbase_player.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.cargo_hold.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.fuel_tank.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.ammo_bank.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -431,7 +411,7 @@ impl<'a, 'b> RespawnToLoadingBayCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -453,9 +433,9 @@ impl<'a, 'b> RespawnToLoadingBayCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -480,7 +460,7 @@ pub struct RespawnToLoadingBayCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(RespawnToLoadingBayCpiBuilderInstruction {
             __program: program,
             key: None,
@@ -500,7 +480,7 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
@@ -508,7 +488,7 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile(
         &mut self,
-        owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile = Some(owning_profile);
         self
@@ -517,32 +497,26 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn fleet(&mut self, fleet: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -550,7 +524,7 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn starbase_player(
         &mut self,
-        starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+        starbase_player: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.starbase_player = Some(starbase_player);
         self
@@ -559,26 +533,20 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn cargo_hold(
         &mut self,
-        cargo_hold: &'b solana_program::account_info::AccountInfo<'a>,
+        cargo_hold: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.cargo_hold = Some(cargo_hold);
         self
     }
     /// The fleet `fuel_tank` cargo pod
     #[inline(always)]
-    pub fn fuel_tank(
-        &mut self,
-        fuel_tank: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn fuel_tank(&mut self, fuel_tank: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.fuel_tank = Some(fuel_tank);
         self
     }
     /// The fleet `ammo_bank` cargo pod
     #[inline(always)]
-    pub fn ammo_bank(
-        &mut self,
-        ammo_bank: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn ammo_bank(&mut self, ammo_bank: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.ammo_bank = Some(ammo_bank);
         self
     }
@@ -591,7 +559,7 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -607,11 +575,7 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -619,15 +583,12 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = RespawnToLoadingBayInstructionArgs {
             key_index: self
                 .instruction
@@ -677,22 +638,18 @@ impl<'a, 'b> RespawnToLoadingBayCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct RespawnToLoadingBayCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase_player: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    cargo_hold: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    fuel_tank: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    ammo_bank: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase_player: Option<&'b solana_account_info::AccountInfo<'a>>,
+    cargo_hold: Option<&'b solana_account_info::AccountInfo<'a>>,
+    fuel_tank: Option<&'b solana_account_info::AccountInfo<'a>>,
+    ammo_bank: Option<&'b solana_account_info::AccountInfo<'a>>,
     key_index: Option<u16>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

@@ -5795,7 +5795,12 @@ dependencies = [
  "num-traits",
  "serde",
  "serde_with",
+ "solana-account-info",
+ "solana-cpi",
+ "solana-instruction",
  "solana-program",
+ "solana-program-error",
+ "solana-pubkey",
  "thiserror 2.0.12",
 ]
 

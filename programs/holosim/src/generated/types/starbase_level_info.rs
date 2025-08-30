@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Information associated with `Starbase` levels
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]

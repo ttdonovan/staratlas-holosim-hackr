@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Struct that represents info on a single ship type in a fleet
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]

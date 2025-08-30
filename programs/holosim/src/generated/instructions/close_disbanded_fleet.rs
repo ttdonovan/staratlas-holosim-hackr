@@ -8,26 +8,28 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const CLOSE_DISBANDED_FLEET_DISCRIMINATOR: [u8; 8] = [214, 150, 149, 156, 245, 123, 37, 165];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct CloseDisbandedFleet {
     /// The key on the player profile.
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The player profile.
-    pub player_profile: solana_program::pubkey::Pubkey,
+    pub player_profile: solana_pubkey::Pubkey,
     /// The funds_to - receives rent refund
-    pub funds_to: solana_program::pubkey::Pubkey,
+    pub funds_to: solana_pubkey::Pubkey,
     /// The [`DisbandedFleet`] account
-    pub disbanded_fleet: solana_program::pubkey::Pubkey,
+    pub disbanded_fleet: solana_pubkey::Pubkey,
     /// The [`FleetShips`] account
-    pub fleet_ships: solana_program::pubkey::Pubkey,
+    pub fleet_ships: solana_pubkey::Pubkey,
 }
 
 impl CloseDisbandedFleet {
     pub fn instruction(
         &self,
         args: CloseDisbandedFleetInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -35,25 +37,22 @@ impl CloseDisbandedFleet {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: CloseDisbandedFleetInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.player_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.funds_to,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(self.funds_to, false));
+        accounts.push(solana_instruction::AccountMeta::new(
             self.disbanded_fleet,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.fleet_ships,
             false,
         ));
@@ -62,7 +61,7 @@ impl CloseDisbandedFleet {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -107,13 +106,13 @@ pub struct CloseDisbandedFleetInstructionArgs {
 ///   4. `[writable]` fleet_ships
 #[derive(Clone, Debug, Default)]
 pub struct CloseDisbandedFleetBuilder {
-    key: Option<solana_program::pubkey::Pubkey>,
-    player_profile: Option<solana_program::pubkey::Pubkey>,
-    funds_to: Option<solana_program::pubkey::Pubkey>,
-    disbanded_fleet: Option<solana_program::pubkey::Pubkey>,
-    fleet_ships: Option<solana_program::pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    player_profile: Option<solana_pubkey::Pubkey>,
+    funds_to: Option<solana_pubkey::Pubkey>,
+    disbanded_fleet: Option<solana_pubkey::Pubkey>,
+    fleet_ships: Option<solana_pubkey::Pubkey>,
     key_index: Option<u16>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl CloseDisbandedFleetBuilder {
@@ -122,34 +121,31 @@ impl CloseDisbandedFleetBuilder {
     }
     /// The key on the player profile.
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The player profile.
     #[inline(always)]
-    pub fn player_profile(&mut self, player_profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn player_profile(&mut self, player_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.player_profile = Some(player_profile);
         self
     }
     /// The funds_to - receives rent refund
     #[inline(always)]
-    pub fn funds_to(&mut self, funds_to: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn funds_to(&mut self, funds_to: solana_pubkey::Pubkey) -> &mut Self {
         self.funds_to = Some(funds_to);
         self
     }
     /// The [`DisbandedFleet`] account
     #[inline(always)]
-    pub fn disbanded_fleet(
-        &mut self,
-        disbanded_fleet: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn disbanded_fleet(&mut self, disbanded_fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.disbanded_fleet = Some(disbanded_fleet);
         self
     }
     /// The [`FleetShips`] account
     #[inline(always)]
-    pub fn fleet_ships(&mut self, fleet_ships: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fleet_ships(&mut self, fleet_ships: solana_pubkey::Pubkey) -> &mut Self {
         self.fleet_ships = Some(fleet_ships);
         self
     }
@@ -160,10 +156,7 @@ impl CloseDisbandedFleetBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -171,13 +164,13 @@ impl CloseDisbandedFleetBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = CloseDisbandedFleet {
             key: self.key.expect("key is not set"),
             player_profile: self.player_profile.expect("player_profile is not set"),
@@ -196,38 +189,38 @@ impl CloseDisbandedFleetBuilder {
 /// `close_disbanded_fleet` CPI accounts.
 pub struct CloseDisbandedFleetCpiAccounts<'a, 'b> {
     /// The key on the player profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The player profile.
-    pub player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The funds_to - receives rent refund
-    pub funds_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funds_to: &'b solana_account_info::AccountInfo<'a>,
     /// The [`DisbandedFleet`] account
-    pub disbanded_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub disbanded_fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`FleetShips`] account
-    pub fleet_ships: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet_ships: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `close_disbanded_fleet` CPI instruction.
 pub struct CloseDisbandedFleetCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The key on the player profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The player profile.
-    pub player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The funds_to - receives rent refund
-    pub funds_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funds_to: &'b solana_account_info::AccountInfo<'a>,
     /// The [`DisbandedFleet`] account
-    pub disbanded_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub disbanded_fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`FleetShips`] account
-    pub fleet_ships: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet_ships: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: CloseDisbandedFleetInstructionArgs,
 }
 
 impl<'a, 'b> CloseDisbandedFleetCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: CloseDisbandedFleetCpiAccounts<'a, 'b>,
         args: CloseDisbandedFleetInstructionArgs,
     ) -> Self {
@@ -242,25 +235,18 @@ impl<'a, 'b> CloseDisbandedFleetCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -269,35 +255,31 @@ impl<'a, 'b> CloseDisbandedFleetCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.player_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.funds_to.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.disbanded_fleet.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.fleet_ships.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -307,7 +289,7 @@ impl<'a, 'b> CloseDisbandedFleetCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -324,9 +306,9 @@ impl<'a, 'b> CloseDisbandedFleetCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -346,7 +328,7 @@ pub struct CloseDisbandedFleetCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(CloseDisbandedFleetCpiBuilderInstruction {
             __program: program,
             key: None,
@@ -361,7 +343,7 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
     }
     /// The key on the player profile.
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
@@ -369,17 +351,14 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn player_profile(
         &mut self,
-        player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        player_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.player_profile = Some(player_profile);
         self
     }
     /// The funds_to - receives rent refund
     #[inline(always)]
-    pub fn funds_to(
-        &mut self,
-        funds_to: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn funds_to(&mut self, funds_to: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.funds_to = Some(funds_to);
         self
     }
@@ -387,7 +366,7 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn disbanded_fleet(
         &mut self,
-        disbanded_fleet: &'b solana_program::account_info::AccountInfo<'a>,
+        disbanded_fleet: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.disbanded_fleet = Some(disbanded_fleet);
         self
@@ -396,7 +375,7 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn fleet_ships(
         &mut self,
-        fleet_ships: &'b solana_program::account_info::AccountInfo<'a>,
+        fleet_ships: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.fleet_ships = Some(fleet_ships);
         self
@@ -410,7 +389,7 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -426,11 +405,7 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -438,15 +413,12 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = CloseDisbandedFleetInstructionArgs {
             key_index: self
                 .instruction
@@ -486,17 +458,13 @@ impl<'a, 'b> CloseDisbandedFleetCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct CloseDisbandedFleetCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    player_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    funds_to: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    disbanded_fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    fleet_ships: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    player_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    funds_to: Option<&'b solana_account_info::AccountInfo<'a>>,
+    disbanded_fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    fleet_ships: Option<&'b solana_account_info::AccountInfo<'a>>,
     key_index: Option<u16>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

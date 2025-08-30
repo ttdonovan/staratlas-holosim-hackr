@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// An account used to record how many crew members have been added to the game by a player
 /// This is meant to be used temporarily during the crew "pre add" period where players can add crew members to the game but not use them
@@ -42,6 +42,8 @@ pub struct PlayerCrewRecord {
     pub bump: u8,
 }
 
+pub const PLAYER_CREW_RECORD_DISCRIMINATOR: [u8; 8] = [221, 185, 48, 7, 75, 196, 38, 219];
+
 impl PlayerCrewRecord {
     pub const LEN: usize = 110;
 
@@ -52,12 +54,10 @@ impl PlayerCrewRecord {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for PlayerCrewRecord {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for PlayerCrewRecord {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -66,7 +66,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for PlayerCrewR
 #[cfg(feature = "fetch")]
 pub fn fetch_player_crew_record(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<PlayerCrewRecord>, std::io::Error> {
     let accounts = fetch_all_player_crew_record(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -75,7 +75,7 @@ pub fn fetch_player_crew_record(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_player_crew_record(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<PlayerCrewRecord>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -100,7 +100,7 @@ pub fn fetch_all_player_crew_record(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_player_crew_record(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<PlayerCrewRecord>, std::io::Error> {
     let accounts = fetch_all_maybe_player_crew_record(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -109,7 +109,7 @@ pub fn fetch_maybe_player_crew_record(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_player_crew_record(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<PlayerCrewRecord>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -155,5 +155,5 @@ impl anchor_lang::IdlBuild for PlayerCrewRecord {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for PlayerCrewRecord {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

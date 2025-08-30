@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Survey Data Unit (SDU) Tracker
 
@@ -70,6 +70,8 @@ pub struct SurveyDataUnitTracker {
     pub scan_chance_regen_period: i16,
 }
 
+pub const SURVEY_DATA_UNIT_TRACKER_DISCRIMINATOR: [u8; 8] = [234, 127, 227, 90, 144, 65, 85, 111];
+
 impl SurveyDataUnitTracker {
     pub const LEN: usize = 256;
 
@@ -80,12 +82,10 @@ impl SurveyDataUnitTracker {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for SurveyDataUnitTracker {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for SurveyDataUnitTracker {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -94,7 +94,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for SurveyDataU
 #[cfg(feature = "fetch")]
 pub fn fetch_survey_data_unit_tracker(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<SurveyDataUnitTracker>, std::io::Error> {
     let accounts = fetch_all_survey_data_unit_tracker(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -103,7 +103,7 @@ pub fn fetch_survey_data_unit_tracker(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_survey_data_unit_tracker(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<SurveyDataUnitTracker>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -129,7 +129,7 @@ pub fn fetch_all_survey_data_unit_tracker(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_survey_data_unit_tracker(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<SurveyDataUnitTracker>, std::io::Error> {
     let accounts = fetch_all_maybe_survey_data_unit_tracker(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -138,7 +138,7 @@ pub fn fetch_maybe_survey_data_unit_tracker(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_survey_data_unit_tracker(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<SurveyDataUnitTracker>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -184,5 +184,5 @@ impl anchor_lang::IdlBuild for SurveyDataUnitTracker {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for SurveyDataUnitTracker {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

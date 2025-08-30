@@ -9,46 +9,48 @@ use crate::generated::types::KeyIndexInput;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const COMPLETE_STARBASE_UPGRADE_DISCRIMINATOR: [u8; 8] = [143, 92, 192, 249, 21, 108, 173, 81];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct CompleteStarbaseUpgrade {
     /// The funder for the new crafting process
-    pub funder: solana_program::pubkey::Pubkey,
+    pub funder: solana_pubkey::Pubkey,
     /// The [`Starbase`] account
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: solana_program::pubkey::Pubkey,
+    pub starbase_player: solana_pubkey::Pubkey,
     /// The `CraftingFacility` account for crafting at this `Starbase`
-    pub crafting_facility: solana_program::pubkey::Pubkey,
+    pub crafting_facility: solana_pubkey::Pubkey,
     /// The `CraftingFacility` account for starbase upgrades
-    pub upgrade_facility: solana_program::pubkey::Pubkey,
+    pub upgrade_facility: solana_pubkey::Pubkey,
     /// The crafting recipe for the starbase upgrade
-    pub upgrade_recipe: solana_program::pubkey::Pubkey,
+    pub upgrade_recipe: solana_pubkey::Pubkey,
     /// The crafting recipe category for the next `Starbase` level
-    pub new_recipe_category: solana_program::pubkey::Pubkey,
+    pub new_recipe_category: solana_pubkey::Pubkey,
     /// The crafting domain
-    pub crafting_domain: solana_program::pubkey::Pubkey,
+    pub crafting_domain: solana_pubkey::Pubkey,
     /// The key authorized for this instruction
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The [`Profile`] account
-    pub profile: solana_program::pubkey::Pubkey,
+    pub profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub profile_faction: solana_program::pubkey::Pubkey,
+    pub profile_faction: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The [`GameState`] account
-    pub game_state: solana_program::pubkey::Pubkey,
+    pub game_state: solana_pubkey::Pubkey,
     /// The Crafting Program
-    pub crafting_program: solana_program::pubkey::Pubkey,
+    pub crafting_program: solana_pubkey::Pubkey,
     /// Solana System program
-    pub system_program: solana_program::pubkey::Pubkey,
+    pub system_program: solana_pubkey::Pubkey,
 }
 
 impl CompleteStarbaseUpgrade {
     pub fn instruction(
         &self,
         args: CompleteStarbaseUpgradeInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -56,65 +58,59 @@ impl CompleteStarbaseUpgrade {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: CompleteStarbaseUpgradeInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(15 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.funder,
-            true,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.starbase,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.funder, true));
+        accounts.push(solana_instruction::AccountMeta::new(self.starbase, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase_player,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.crafting_facility,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.upgrade_facility,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.upgrade_recipe,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.new_recipe_category,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crafting_domain,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_state,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crafting_program,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
@@ -123,7 +119,7 @@ impl CompleteStarbaseUpgrade {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -178,23 +174,23 @@ pub struct CompleteStarbaseUpgradeInstructionArgs {
 ///   14. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct CompleteStarbaseUpgradeBuilder {
-    funder: Option<solana_program::pubkey::Pubkey>,
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    starbase_player: Option<solana_program::pubkey::Pubkey>,
-    crafting_facility: Option<solana_program::pubkey::Pubkey>,
-    upgrade_facility: Option<solana_program::pubkey::Pubkey>,
-    upgrade_recipe: Option<solana_program::pubkey::Pubkey>,
-    new_recipe_category: Option<solana_program::pubkey::Pubkey>,
-    crafting_domain: Option<solana_program::pubkey::Pubkey>,
-    key: Option<solana_program::pubkey::Pubkey>,
-    profile: Option<solana_program::pubkey::Pubkey>,
-    profile_faction: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    game_state: Option<solana_program::pubkey::Pubkey>,
-    crafting_program: Option<solana_program::pubkey::Pubkey>,
-    system_program: Option<solana_program::pubkey::Pubkey>,
+    funder: Option<solana_pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    starbase_player: Option<solana_pubkey::Pubkey>,
+    crafting_facility: Option<solana_pubkey::Pubkey>,
+    upgrade_facility: Option<solana_pubkey::Pubkey>,
+    upgrade_recipe: Option<solana_pubkey::Pubkey>,
+    new_recipe_category: Option<solana_pubkey::Pubkey>,
+    crafting_domain: Option<solana_pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    profile: Option<solana_pubkey::Pubkey>,
+    profile_faction: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    game_state: Option<solana_pubkey::Pubkey>,
+    crafting_program: Option<solana_pubkey::Pubkey>,
+    system_program: Option<solana_pubkey::Pubkey>,
     input: Option<KeyIndexInput>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl CompleteStarbaseUpgradeBuilder {
@@ -203,113 +199,92 @@ impl CompleteStarbaseUpgradeBuilder {
     }
     /// The funder for the new crafting process
     #[inline(always)]
-    pub fn funder(&mut self, funder: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn funder(&mut self, funder: solana_pubkey::Pubkey) -> &mut Self {
         self.funder = Some(funder);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The [`StarbasePlayer`] Account
     #[inline(always)]
-    pub fn starbase_player(
-        &mut self,
-        starbase_player: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn starbase_player(&mut self, starbase_player: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase_player = Some(starbase_player);
         self
     }
     /// The `CraftingFacility` account for crafting at this `Starbase`
     #[inline(always)]
-    pub fn crafting_facility(
-        &mut self,
-        crafting_facility: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_facility(&mut self, crafting_facility: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_facility = Some(crafting_facility);
         self
     }
     /// The `CraftingFacility` account for starbase upgrades
     #[inline(always)]
-    pub fn upgrade_facility(
-        &mut self,
-        upgrade_facility: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn upgrade_facility(&mut self, upgrade_facility: solana_pubkey::Pubkey) -> &mut Self {
         self.upgrade_facility = Some(upgrade_facility);
         self
     }
     /// The crafting recipe for the starbase upgrade
     #[inline(always)]
-    pub fn upgrade_recipe(&mut self, upgrade_recipe: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn upgrade_recipe(&mut self, upgrade_recipe: solana_pubkey::Pubkey) -> &mut Self {
         self.upgrade_recipe = Some(upgrade_recipe);
         self
     }
     /// The crafting recipe category for the next `Starbase` level
     #[inline(always)]
-    pub fn new_recipe_category(
-        &mut self,
-        new_recipe_category: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn new_recipe_category(&mut self, new_recipe_category: solana_pubkey::Pubkey) -> &mut Self {
         self.new_recipe_category = Some(new_recipe_category);
         self
     }
     /// The crafting domain
     #[inline(always)]
-    pub fn crafting_domain(
-        &mut self,
-        crafting_domain: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_domain(&mut self, crafting_domain: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_domain = Some(crafting_domain);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(&mut self, profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn profile(&mut self, profile: solana_pubkey::Pubkey) -> &mut Self {
         self.profile = Some(profile);
         self
     }
     /// The faction that the profile belongs to.
     #[inline(always)]
-    pub fn profile_faction(
-        &mut self,
-        profile_faction: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn profile_faction(&mut self, profile_faction: solana_pubkey::Pubkey) -> &mut Self {
         self.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The [`GameState`] account
     #[inline(always)]
-    pub fn game_state(&mut self, game_state: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_state(&mut self, game_state: solana_pubkey::Pubkey) -> &mut Self {
         self.game_state = Some(game_state);
         self
     }
     /// The Crafting Program
     #[inline(always)]
-    pub fn crafting_program(
-        &mut self,
-        crafting_program: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn crafting_program(&mut self, crafting_program: solana_pubkey::Pubkey) -> &mut Self {
         self.crafting_program = Some(crafting_program);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
     /// Solana System program
     #[inline(always)]
-    pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
         self
     }
@@ -320,10 +295,7 @@ impl CompleteStarbaseUpgradeBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -331,13 +303,13 @@ impl CompleteStarbaseUpgradeBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = CompleteStarbaseUpgrade {
             funder: self.funder.expect("funder is not set"),
             starbase: self.starbase.expect("starbase is not set"),
@@ -359,7 +331,7 @@ impl CompleteStarbaseUpgradeBuilder {
             crafting_program: self.crafting_program.expect("crafting_program is not set"),
             system_program: self
                 .system_program
-                .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
+                .unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
         };
         let args = CompleteStarbaseUpgradeInstructionArgs {
             input: self.input.clone().expect("input is not set"),
@@ -372,78 +344,78 @@ impl CompleteStarbaseUpgradeBuilder {
 /// `complete_starbase_upgrade` CPI accounts.
 pub struct CompleteStarbaseUpgradeCpiAccounts<'a, 'b> {
     /// The funder for the new crafting process
-    pub funder: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funder: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The `CraftingFacility` account for crafting at this `Starbase`
-    pub crafting_facility: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_facility: &'b solana_account_info::AccountInfo<'a>,
     /// The `CraftingFacility` account for starbase upgrades
-    pub upgrade_facility: &'b solana_program::account_info::AccountInfo<'a>,
+    pub upgrade_facility: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting recipe for the starbase upgrade
-    pub upgrade_recipe: &'b solana_program::account_info::AccountInfo<'a>,
+    pub upgrade_recipe: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting recipe category for the next `Starbase` level
-    pub new_recipe_category: &'b solana_program::account_info::AccountInfo<'a>,
+    pub new_recipe_category: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting domain
-    pub crafting_domain: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_domain: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The Crafting Program
-    pub crafting_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_program: &'b solana_account_info::AccountInfo<'a>,
     /// Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `complete_starbase_upgrade` CPI instruction.
 pub struct CompleteStarbaseUpgradeCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The funder for the new crafting process
-    pub funder: &'b solana_program::account_info::AccountInfo<'a>,
+    pub funder: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The `CraftingFacility` account for crafting at this `Starbase`
-    pub crafting_facility: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_facility: &'b solana_account_info::AccountInfo<'a>,
     /// The `CraftingFacility` account for starbase upgrades
-    pub upgrade_facility: &'b solana_program::account_info::AccountInfo<'a>,
+    pub upgrade_facility: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting recipe for the starbase upgrade
-    pub upgrade_recipe: &'b solana_program::account_info::AccountInfo<'a>,
+    pub upgrade_recipe: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting recipe category for the next `Starbase` level
-    pub new_recipe_category: &'b solana_program::account_info::AccountInfo<'a>,
+    pub new_recipe_category: &'b solana_account_info::AccountInfo<'a>,
     /// The crafting domain
-    pub crafting_domain: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_domain: &'b solana_account_info::AccountInfo<'a>,
     /// The key authorized for this instruction
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Profile`] account
-    pub profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// The Crafting Program
-    pub crafting_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crafting_program: &'b solana_account_info::AccountInfo<'a>,
     /// Solana System program
-    pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: CompleteStarbaseUpgradeInstructionArgs,
 }
 
 impl<'a, 'b> CompleteStarbaseUpgradeCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: CompleteStarbaseUpgradeCpiAccounts<'a, 'b>,
         args: CompleteStarbaseUpgradeInstructionArgs,
     ) -> Self {
@@ -468,25 +440,18 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -495,75 +460,68 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(15 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.funder.key,
-            true,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(*self.funder.key, true));
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase_player.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.crafting_facility.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.upgrade_facility.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.upgrade_recipe.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.new_recipe_category.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crafting_domain.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_state.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crafting_program.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -573,7 +531,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -600,9 +558,9 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -632,7 +590,7 @@ pub struct CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(CompleteStarbaseUpgradeCpiBuilderInstruction {
             __program: program,
             funder: None,
@@ -657,19 +615,13 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     }
     /// The funder for the new crafting process
     #[inline(always)]
-    pub fn funder(
-        &mut self,
-        funder: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn funder(&mut self, funder: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.funder = Some(funder);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -677,7 +629,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn starbase_player(
         &mut self,
-        starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+        starbase_player: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.starbase_player = Some(starbase_player);
         self
@@ -686,7 +638,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_facility(
         &mut self,
-        crafting_facility: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_facility: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_facility = Some(crafting_facility);
         self
@@ -695,7 +647,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn upgrade_facility(
         &mut self,
-        upgrade_facility: &'b solana_program::account_info::AccountInfo<'a>,
+        upgrade_facility: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.upgrade_facility = Some(upgrade_facility);
         self
@@ -704,7 +656,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn upgrade_recipe(
         &mut self,
-        upgrade_recipe: &'b solana_program::account_info::AccountInfo<'a>,
+        upgrade_recipe: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.upgrade_recipe = Some(upgrade_recipe);
         self
@@ -713,7 +665,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn new_recipe_category(
         &mut self,
-        new_recipe_category: &'b solana_program::account_info::AccountInfo<'a>,
+        new_recipe_category: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.new_recipe_category = Some(new_recipe_category);
         self
@@ -722,23 +674,20 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_domain(
         &mut self,
-        crafting_domain: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_domain: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_domain = Some(crafting_domain);
         self
     }
     /// The key authorized for this instruction
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
     /// The [`Profile`] account
     #[inline(always)]
-    pub fn profile(
-        &mut self,
-        profile: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn profile(&mut self, profile: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.profile = Some(profile);
         self
     }
@@ -746,17 +695,14 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn profile_faction(
         &mut self,
-        profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.profile_faction = Some(profile_faction);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -764,7 +710,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn game_state(
         &mut self,
-        game_state: &'b solana_program::account_info::AccountInfo<'a>,
+        game_state: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.game_state = Some(game_state);
         self
@@ -773,7 +719,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crafting_program(
         &mut self,
-        crafting_program: &'b solana_program::account_info::AccountInfo<'a>,
+        crafting_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crafting_program = Some(crafting_program);
         self
@@ -782,7 +728,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn system_program(
         &mut self,
-        system_program: &'b solana_program::account_info::AccountInfo<'a>,
+        system_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.system_program = Some(system_program);
         self
@@ -796,7 +742,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -812,11 +758,7 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -824,15 +766,12 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = CompleteStarbaseUpgradeInstructionArgs {
             input: self.instruction.input.clone().expect("input is not set"),
         };
@@ -906,27 +845,23 @@ impl<'a, 'b> CompleteStarbaseUpgradeCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct CompleteStarbaseUpgradeCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    funder: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase_player: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_facility: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    upgrade_facility: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    upgrade_recipe: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    new_recipe_category: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_domain: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_state: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crafting_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    funder: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase_player: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_facility: Option<&'b solana_account_info::AccountInfo<'a>>,
+    upgrade_facility: Option<&'b solana_account_info::AccountInfo<'a>>,
+    upgrade_recipe: Option<&'b solana_account_info::AccountInfo<'a>>,
+    new_recipe_category: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_domain: Option<&'b solana_account_info::AccountInfo<'a>>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_state: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crafting_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     input: Option<KeyIndexInput>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

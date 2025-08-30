@@ -8,34 +8,36 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const IDLE_TO_RESPAWN_DISCRIMINATOR: [u8; 8] = [235, 207, 200, 174, 161, 116, 91, 168];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct IdleToRespawn {
     /// The key on the profile.
-    pub key: solana_program::pubkey::Pubkey,
+    pub key: solana_pubkey::Pubkey,
     /// The profile that owns the fleet.
-    pub owning_profile: solana_program::pubkey::Pubkey,
+    pub owning_profile: solana_pubkey::Pubkey,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: solana_program::pubkey::Pubkey,
+    pub owning_profile_faction: solana_pubkey::Pubkey,
     /// The fleet.
-    pub fleet: solana_program::pubkey::Pubkey,
+    pub fleet: solana_pubkey::Pubkey,
     /// The [`Game`] account
-    pub game_id: solana_program::pubkey::Pubkey,
+    pub game_id: solana_pubkey::Pubkey,
     /// The [`GameState`] account
-    pub game_state: solana_program::pubkey::Pubkey,
+    pub game_state: solana_pubkey::Pubkey,
     /// Source Token account for ATLAS, owned by the player
-    pub atlas_token_from: solana_program::pubkey::Pubkey,
+    pub atlas_token_from: solana_pubkey::Pubkey,
     /// Vault Token account for ATLAS
-    pub atlas_token_to: solana_program::pubkey::Pubkey,
+    pub atlas_token_to: solana_pubkey::Pubkey,
     /// The Solana Token Program
-    pub token_program: solana_program::pubkey::Pubkey,
+    pub token_program: solana_pubkey::Pubkey,
 }
 
 impl IdleToRespawn {
     pub fn instruction(
         &self,
         args: IdleToRespawnInstructionArgs,
-    ) -> solana_program::instruction::Instruction {
+    ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -43,40 +45,38 @@ impl IdleToRespawn {
     pub fn instruction_with_remaining_accounts(
         &self,
         args: IdleToRespawnInstructionArgs,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(9 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.key, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.owning_profile_faction,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.fleet, false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(self.fleet, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_id,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.game_state,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.atlas_token_from,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.atlas_token_to,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.token_program,
             false,
         ));
@@ -85,7 +85,7 @@ impl IdleToRespawn {
         let mut args = borsh::to_vec(&args).unwrap();
         data.append(&mut args);
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -134,17 +134,17 @@ pub struct IdleToRespawnInstructionArgs {
 ///   8. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
 #[derive(Clone, Debug, Default)]
 pub struct IdleToRespawnBuilder {
-    key: Option<solana_program::pubkey::Pubkey>,
-    owning_profile: Option<solana_program::pubkey::Pubkey>,
-    owning_profile_faction: Option<solana_program::pubkey::Pubkey>,
-    fleet: Option<solana_program::pubkey::Pubkey>,
-    game_id: Option<solana_program::pubkey::Pubkey>,
-    game_state: Option<solana_program::pubkey::Pubkey>,
-    atlas_token_from: Option<solana_program::pubkey::Pubkey>,
-    atlas_token_to: Option<solana_program::pubkey::Pubkey>,
-    token_program: Option<solana_program::pubkey::Pubkey>,
+    key: Option<solana_pubkey::Pubkey>,
+    owning_profile: Option<solana_pubkey::Pubkey>,
+    owning_profile_faction: Option<solana_pubkey::Pubkey>,
+    fleet: Option<solana_pubkey::Pubkey>,
+    game_id: Option<solana_pubkey::Pubkey>,
+    game_state: Option<solana_pubkey::Pubkey>,
+    atlas_token_from: Option<solana_pubkey::Pubkey>,
+    atlas_token_to: Option<solana_pubkey::Pubkey>,
+    token_program: Option<solana_pubkey::Pubkey>,
     key_index: Option<u16>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl IdleToRespawnBuilder {
@@ -153,13 +153,13 @@ impl IdleToRespawnBuilder {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn key(&mut self, key: solana_pubkey::Pubkey) -> &mut Self {
         self.key = Some(key);
         self
     }
     /// The profile that owns the fleet.
     #[inline(always)]
-    pub fn owning_profile(&mut self, owning_profile: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn owning_profile(&mut self, owning_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.owning_profile = Some(owning_profile);
         self
     }
@@ -167,48 +167,45 @@ impl IdleToRespawnBuilder {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: solana_program::pubkey::Pubkey,
+        owning_profile_faction: solana_pubkey::Pubkey,
     ) -> &mut Self {
         self.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn fleet(&mut self, fleet: solana_pubkey::Pubkey) -> &mut Self {
         self.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(&mut self, game_id: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_id(&mut self, game_id: solana_pubkey::Pubkey) -> &mut Self {
         self.game_id = Some(game_id);
         self
     }
     /// The [`GameState`] account
     #[inline(always)]
-    pub fn game_state(&mut self, game_state: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn game_state(&mut self, game_state: solana_pubkey::Pubkey) -> &mut Self {
         self.game_state = Some(game_state);
         self
     }
     /// Source Token account for ATLAS, owned by the player
     #[inline(always)]
-    pub fn atlas_token_from(
-        &mut self,
-        atlas_token_from: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn atlas_token_from(&mut self, atlas_token_from: solana_pubkey::Pubkey) -> &mut Self {
         self.atlas_token_from = Some(atlas_token_from);
         self
     }
     /// Vault Token account for ATLAS
     #[inline(always)]
-    pub fn atlas_token_to(&mut self, atlas_token_to: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn atlas_token_to(&mut self, atlas_token_to: solana_pubkey::Pubkey) -> &mut Self {
         self.atlas_token_to = Some(atlas_token_to);
         self
     }
     /// `[optional account, default to 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA']`
     /// The Solana Token Program
     #[inline(always)]
-    pub fn token_program(&mut self, token_program: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn token_program(&mut self, token_program: solana_pubkey::Pubkey) -> &mut Self {
         self.token_program = Some(token_program);
         self
     }
@@ -219,10 +216,7 @@ impl IdleToRespawnBuilder {
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -230,13 +224,13 @@ impl IdleToRespawnBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = IdleToRespawn {
             key: self.key.expect("key is not set"),
             owning_profile: self.owning_profile.expect("owning_profile is not set"),
@@ -248,7 +242,7 @@ impl IdleToRespawnBuilder {
             game_state: self.game_state.expect("game_state is not set"),
             atlas_token_from: self.atlas_token_from.expect("atlas_token_from is not set"),
             atlas_token_to: self.atlas_token_to.expect("atlas_token_to is not set"),
-            token_program: self.token_program.unwrap_or(solana_program::pubkey!(
+            token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!(
                 "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
             )),
         };
@@ -263,54 +257,54 @@ impl IdleToRespawnBuilder {
 /// `idle_to_respawn` CPI accounts.
 pub struct IdleToRespawnCpiAccounts<'a, 'b> {
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// Source Token account for ATLAS, owned by the player
-    pub atlas_token_from: &'b solana_program::account_info::AccountInfo<'a>,
+    pub atlas_token_from: &'b solana_account_info::AccountInfo<'a>,
     /// Vault Token account for ATLAS
-    pub atlas_token_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub atlas_token_to: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `idle_to_respawn` CPI instruction.
 pub struct IdleToRespawnCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The key on the profile.
-    pub key: &'b solana_program::account_info::AccountInfo<'a>,
+    pub key: &'b solana_account_info::AccountInfo<'a>,
     /// The profile that owns the fleet.
-    pub owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The faction that the profile belongs to.
-    pub owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+    pub owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     /// The fleet.
-    pub fleet: &'b solana_program::account_info::AccountInfo<'a>,
+    pub fleet: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Game`] account
-    pub game_id: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_id: &'b solana_account_info::AccountInfo<'a>,
     /// The [`GameState`] account
-    pub game_state: &'b solana_program::account_info::AccountInfo<'a>,
+    pub game_state: &'b solana_account_info::AccountInfo<'a>,
     /// Source Token account for ATLAS, owned by the player
-    pub atlas_token_from: &'b solana_program::account_info::AccountInfo<'a>,
+    pub atlas_token_from: &'b solana_account_info::AccountInfo<'a>,
     /// Vault Token account for ATLAS
-    pub atlas_token_to: &'b solana_program::account_info::AccountInfo<'a>,
+    pub atlas_token_to: &'b solana_account_info::AccountInfo<'a>,
     /// The Solana Token Program
-    pub token_program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub token_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: IdleToRespawnInstructionArgs,
 }
 
 impl<'a, 'b> IdleToRespawnCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: IdleToRespawnCpiAccounts<'a, 'b>,
         args: IdleToRespawnInstructionArgs,
     ) -> Self {
@@ -329,25 +323,18 @@ impl<'a, 'b> IdleToRespawnCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -356,51 +343,44 @@ impl<'a, 'b> IdleToRespawnCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(9 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.key.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.owning_profile_faction.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.fleet.key,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new(*self.fleet.key, false));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_id.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.game_state.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.atlas_token_from.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.atlas_token_to.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.token_program.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -410,7 +390,7 @@ impl<'a, 'b> IdleToRespawnCpi<'a, 'b> {
         let mut args = borsh::to_vec(&self.__args).unwrap();
         data.append(&mut args);
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -431,9 +411,9 @@ impl<'a, 'b> IdleToRespawnCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -457,7 +437,7 @@ pub struct IdleToRespawnCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(IdleToRespawnCpiBuilderInstruction {
             __program: program,
             key: None,
@@ -476,7 +456,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     }
     /// The key on the profile.
     #[inline(always)]
-    pub fn key(&mut self, key: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn key(&mut self, key: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.key = Some(key);
         self
     }
@@ -484,7 +464,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile(
         &mut self,
-        owning_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile = Some(owning_profile);
         self
@@ -493,23 +473,20 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn owning_profile_faction(
         &mut self,
-        owning_profile_faction: &'b solana_program::account_info::AccountInfo<'a>,
+        owning_profile_faction: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.owning_profile_faction = Some(owning_profile_faction);
         self
     }
     /// The fleet.
     #[inline(always)]
-    pub fn fleet(&mut self, fleet: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+    pub fn fleet(&mut self, fleet: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.fleet = Some(fleet);
         self
     }
     /// The [`Game`] account
     #[inline(always)]
-    pub fn game_id(
-        &mut self,
-        game_id: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn game_id(&mut self, game_id: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.game_id = Some(game_id);
         self
     }
@@ -517,7 +494,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn game_state(
         &mut self,
-        game_state: &'b solana_program::account_info::AccountInfo<'a>,
+        game_state: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.game_state = Some(game_state);
         self
@@ -526,7 +503,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn atlas_token_from(
         &mut self,
-        atlas_token_from: &'b solana_program::account_info::AccountInfo<'a>,
+        atlas_token_from: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.atlas_token_from = Some(atlas_token_from);
         self
@@ -535,7 +512,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn atlas_token_to(
         &mut self,
-        atlas_token_to: &'b solana_program::account_info::AccountInfo<'a>,
+        atlas_token_to: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.atlas_token_to = Some(atlas_token_to);
         self
@@ -544,7 +521,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn token_program(
         &mut self,
-        token_program: &'b solana_program::account_info::AccountInfo<'a>,
+        token_program: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.token_program = Some(token_program);
         self
@@ -558,7 +535,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -574,11 +551,7 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -586,15 +559,12 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let args = IdleToRespawnInstructionArgs {
             key_index: self
                 .instruction
@@ -648,21 +618,17 @@ impl<'a, 'b> IdleToRespawnCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct IdleToRespawnCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    key: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    owning_profile_faction: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    fleet: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_id: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    game_state: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    atlas_token_from: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    atlas_token_to: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    key: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    owning_profile_faction: Option<&'b solana_account_info::AccountInfo<'a>>,
+    fleet: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_id: Option<&'b solana_account_info::AccountInfo<'a>>,
+    game_state: Option<&'b solana_account_info::AccountInfo<'a>>,
+    atlas_token_from: Option<&'b solana_account_info::AccountInfo<'a>>,
+    atlas_token_to: Option<&'b solana_account_info::AccountInfo<'a>>,
+    token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
     key_index: Option<u16>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

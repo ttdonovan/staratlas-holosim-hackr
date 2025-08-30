@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Variables for the Cargo program
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]

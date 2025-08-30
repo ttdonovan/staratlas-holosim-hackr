@@ -8,7 +8,7 @@
 use crate::generated::types::LootInfo;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// Represents the loot available at a location
 
@@ -36,6 +36,8 @@ pub struct Loot {
     pub items: [LootInfo; 2],
 }
 
+pub const LOOT_DISCRIMINATOR: [u8; 8] = [151, 225, 207, 228, 115, 210, 64, 159];
+
 impl Loot {
     pub const LEN: usize = 233;
 
@@ -46,12 +48,10 @@ impl Loot {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Loot {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for Loot {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -60,7 +60,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Loot {
 #[cfg(feature = "fetch")]
 pub fn fetch_loot(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<Loot>, std::io::Error> {
     let accounts = fetch_all_loot(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -69,7 +69,7 @@ pub fn fetch_loot(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_loot(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<Loot>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -94,7 +94,7 @@ pub fn fetch_all_loot(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_loot(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<Loot>, std::io::Error> {
     let accounts = fetch_all_maybe_loot(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -103,7 +103,7 @@ pub fn fetch_maybe_loot(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_loot(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<Loot>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -149,5 +149,5 @@ impl anchor_lang::IdlBuild for Loot {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for Loot {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

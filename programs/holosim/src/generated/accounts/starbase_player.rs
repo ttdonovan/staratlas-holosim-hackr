@@ -7,7 +7,7 @@
 
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 /// The `SAGE` player info within a `Starbase`
 
@@ -60,6 +60,8 @@ pub struct StarbasePlayer {
     pub updated_ship_escrow_count: u32,
 }
 
+pub const STARBASE_PLAYER_DISCRIMINATOR: [u8; 8] = [192, 234, 144, 86, 72, 19, 5, 99];
+
 impl StarbasePlayer {
     pub const LEN: usize = 170;
 
@@ -70,12 +72,10 @@ impl StarbasePlayer {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for StarbasePlayer {
+impl<'a> TryFrom<&solana_account_info::AccountInfo<'a>> for StarbasePlayer {
     type Error = std::io::Error;
 
-    fn try_from(
-        account_info: &solana_program::account_info::AccountInfo<'a>,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(account_info: &solana_account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
@@ -84,7 +84,7 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for StarbasePla
 #[cfg(feature = "fetch")]
 pub fn fetch_starbase_player(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<StarbasePlayer>, std::io::Error> {
     let accounts = fetch_all_starbase_player(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -93,7 +93,7 @@ pub fn fetch_starbase_player(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_starbase_player(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<StarbasePlayer>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -118,7 +118,7 @@ pub fn fetch_all_starbase_player(
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_starbase_player(
     rpc: &solana_client::rpc_client::RpcClient,
-    address: &solana_program::pubkey::Pubkey,
+    address: &solana_pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<StarbasePlayer>, std::io::Error> {
     let accounts = fetch_all_maybe_starbase_player(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -127,7 +127,7 @@ pub fn fetch_maybe_starbase_player(
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_starbase_player(
     rpc: &solana_client::rpc_client::RpcClient,
-    addresses: &[solana_program::pubkey::Pubkey],
+    addresses: &[solana_pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<StarbasePlayer>>, std::io::Error> {
     let accounts = rpc
         .get_multiple_accounts(addresses)
@@ -173,5 +173,5 @@ impl anchor_lang::IdlBuild for StarbasePlayer {}
 
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::Discriminator for StarbasePlayer {
-    const DISCRIMINATOR: [u8; 8] = [0; 8];
+    const DISCRIMINATOR: &[u8] = &[0; 8];
 }

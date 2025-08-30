@@ -8,62 +8,64 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
+pub const MINT_CREW_TO_GAME_DISCRIMINATOR: [u8; 8] = [64, 222, 94, 243, 149, 65, 54, 132];
+
 /// Accounts.
 #[derive(Debug)]
 pub struct MintCrewToGame {
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: solana_program::pubkey::Pubkey,
+    pub sage_player_profile: solana_pubkey::Pubkey,
     /// The [`Starbase`] account
-    pub starbase: solana_program::pubkey::Pubkey,
+    pub starbase: solana_pubkey::Pubkey,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: solana_program::pubkey::Pubkey,
+    pub starbase_player: solana_pubkey::Pubkey,
     /// The [`SageCrewConfig`] Account
-    pub sage_crew_config: solana_program::pubkey::Pubkey,
+    pub sage_crew_config: solana_pubkey::Pubkey,
     /// The crew program `CrewConfig` account
-    pub crew_config: solana_program::pubkey::Pubkey,
+    pub crew_config: solana_pubkey::Pubkey,
     /// Solana Instructions Sysvar
-    pub instructions_sysvar: solana_program::pubkey::Pubkey,
+    pub instructions_sysvar: solana_pubkey::Pubkey,
 }
 
 impl MintCrewToGame {
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(&[])
     }
     #[allow(clippy::arithmetic_side_effects)]
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        remaining_accounts: &[solana_program::instruction::AccountMeta],
-    ) -> solana_program::instruction::Instruction {
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.sage_player_profile,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.starbase,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             self.starbase_player,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.sage_crew_config,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.crew_config,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.instructions_sysvar,
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
         let data = borsh::to_vec(&MintCrewToGameInstructionData::new()).unwrap();
 
-        solana_program::instruction::Instruction {
+        solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -103,13 +105,13 @@ impl Default for MintCrewToGameInstructionData {
 ///   5. `[optional]` instructions_sysvar (default to `Sysvar1nstructions1111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct MintCrewToGameBuilder {
-    sage_player_profile: Option<solana_program::pubkey::Pubkey>,
-    starbase: Option<solana_program::pubkey::Pubkey>,
-    starbase_player: Option<solana_program::pubkey::Pubkey>,
-    sage_crew_config: Option<solana_program::pubkey::Pubkey>,
-    crew_config: Option<solana_program::pubkey::Pubkey>,
-    instructions_sysvar: Option<solana_program::pubkey::Pubkey>,
-    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    sage_player_profile: Option<solana_pubkey::Pubkey>,
+    starbase: Option<solana_pubkey::Pubkey>,
+    starbase_player: Option<solana_pubkey::Pubkey>,
+    sage_crew_config: Option<solana_pubkey::Pubkey>,
+    crew_config: Option<solana_pubkey::Pubkey>,
+    instructions_sysvar: Option<solana_pubkey::Pubkey>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl MintCrewToGameBuilder {
@@ -118,59 +120,44 @@ impl MintCrewToGameBuilder {
     }
     /// The [`SagePlayerProfile`] account
     #[inline(always)]
-    pub fn sage_player_profile(
-        &mut self,
-        sage_player_profile: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn sage_player_profile(&mut self, sage_player_profile: solana_pubkey::Pubkey) -> &mut Self {
         self.sage_player_profile = Some(sage_player_profile);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(&mut self, starbase: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn starbase(&mut self, starbase: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase = Some(starbase);
         self
     }
     /// The [`StarbasePlayer`] Account
     #[inline(always)]
-    pub fn starbase_player(
-        &mut self,
-        starbase_player: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn starbase_player(&mut self, starbase_player: solana_pubkey::Pubkey) -> &mut Self {
         self.starbase_player = Some(starbase_player);
         self
     }
     /// The [`SageCrewConfig`] Account
     #[inline(always)]
-    pub fn sage_crew_config(
-        &mut self,
-        sage_crew_config: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn sage_crew_config(&mut self, sage_crew_config: solana_pubkey::Pubkey) -> &mut Self {
         self.sage_crew_config = Some(sage_crew_config);
         self
     }
     /// The crew program `CrewConfig` account
     #[inline(always)]
-    pub fn crew_config(&mut self, crew_config: solana_program::pubkey::Pubkey) -> &mut Self {
+    pub fn crew_config(&mut self, crew_config: solana_pubkey::Pubkey) -> &mut Self {
         self.crew_config = Some(crew_config);
         self
     }
     /// `[optional account, default to 'Sysvar1nstructions1111111111111111111111111']`
     /// Solana Instructions Sysvar
     #[inline(always)]
-    pub fn instructions_sysvar(
-        &mut self,
-        instructions_sysvar: solana_program::pubkey::Pubkey,
-    ) -> &mut Self {
+    pub fn instructions_sysvar(&mut self, instructions_sysvar: solana_pubkey::Pubkey) -> &mut Self {
         self.instructions_sysvar = Some(instructions_sysvar);
         self
     }
     /// Add an additional account to the instruction.
     #[inline(always)]
-    pub fn add_remaining_account(
-        &mut self,
-        account: solana_program::instruction::AccountMeta,
-    ) -> &mut Self {
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
         self.__remaining_accounts.push(account);
         self
     }
@@ -178,13 +165,13 @@ impl MintCrewToGameBuilder {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[solana_program::instruction::AccountMeta],
+        accounts: &[solana_instruction::AccountMeta],
     ) -> &mut Self {
         self.__remaining_accounts.extend_from_slice(accounts);
         self
     }
     #[allow(clippy::clone_on_copy)]
-    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+    pub fn instruction(&self) -> solana_instruction::Instruction {
         let accounts = MintCrewToGame {
             sage_player_profile: self
                 .sage_player_profile
@@ -193,7 +180,7 @@ impl MintCrewToGameBuilder {
             starbase_player: self.starbase_player.expect("starbase_player is not set"),
             sage_crew_config: self.sage_crew_config.expect("sage_crew_config is not set"),
             crew_config: self.crew_config.expect("crew_config is not set"),
-            instructions_sysvar: self.instructions_sysvar.unwrap_or(solana_program::pubkey!(
+            instructions_sysvar: self.instructions_sysvar.unwrap_or(solana_pubkey::pubkey!(
                 "Sysvar1nstructions1111111111111111111111111"
             )),
         };
@@ -205,40 +192,40 @@ impl MintCrewToGameBuilder {
 /// `mint_crew_to_game` CPI accounts.
 pub struct MintCrewToGameCpiAccounts<'a, 'b> {
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SageCrewConfig`] Account
-    pub sage_crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// The crew program `CrewConfig` account
-    pub crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// Solana Instructions Sysvar
-    pub instructions_sysvar: &'b solana_program::account_info::AccountInfo<'a>,
+    pub instructions_sysvar: &'b solana_account_info::AccountInfo<'a>,
 }
 
 /// `mint_crew_to_game` CPI instruction.
 pub struct MintCrewToGameCpi<'a, 'b> {
     /// The program to invoke.
-    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SagePlayerProfile`] account
-    pub sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     /// The [`Starbase`] account
-    pub starbase: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase: &'b solana_account_info::AccountInfo<'a>,
     /// The [`StarbasePlayer`] Account
-    pub starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+    pub starbase_player: &'b solana_account_info::AccountInfo<'a>,
     /// The [`SageCrewConfig`] Account
-    pub sage_crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub sage_crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// The crew program `CrewConfig` account
-    pub crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+    pub crew_config: &'b solana_account_info::AccountInfo<'a>,
     /// Solana Instructions Sysvar
-    pub instructions_sysvar: &'b solana_program::account_info::AccountInfo<'a>,
+    pub instructions_sysvar: &'b solana_account_info::AccountInfo<'a>,
 }
 
 impl<'a, 'b> MintCrewToGameCpi<'a, 'b> {
     pub fn new(
-        program: &'b solana_program::account_info::AccountInfo<'a>,
+        program: &'b solana_account_info::AccountInfo<'a>,
         accounts: MintCrewToGameCpiAccounts<'a, 'b>,
     ) -> Self {
         Self {
@@ -252,25 +239,18 @@ impl<'a, 'b> MintCrewToGameCpi<'a, 'b> {
         }
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], &[])
     }
     #[inline(always)]
     pub fn invoke_with_remaining_accounts(
         &self,
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
     }
     #[inline(always)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
     }
     #[allow(clippy::arithmetic_side_effects)]
@@ -279,39 +259,35 @@ impl<'a, 'b> MintCrewToGameCpi<'a, 'b> {
     pub fn invoke_signed_with_remaining_accounts(
         &self,
         signers_seeds: &[&[&[u8]]],
-        remaining_accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
-    ) -> solana_program::entrypoint::ProgramResult {
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
         let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.sage_player_profile.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.starbase.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_instruction::AccountMeta::new(
             *self.starbase_player.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.sage_crew_config.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.crew_config.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.instructions_sysvar.key,
             false,
         ));
         remaining_accounts.iter().for_each(|remaining_account| {
-            accounts.push(solana_program::instruction::AccountMeta {
+            accounts.push(solana_instruction::AccountMeta {
                 pubkey: *remaining_account.0.key,
                 is_signer: remaining_account.1,
                 is_writable: remaining_account.2,
@@ -319,7 +295,7 @@ impl<'a, 'b> MintCrewToGameCpi<'a, 'b> {
         });
         let data = borsh::to_vec(&MintCrewToGameInstructionData::new()).unwrap();
 
-        let instruction = solana_program::instruction::Instruction {
+        let instruction = solana_instruction::Instruction {
             program_id: crate::SAGE_ID,
             accounts,
             data,
@@ -337,9 +313,9 @@ impl<'a, 'b> MintCrewToGameCpi<'a, 'b> {
             .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
         if signers_seeds.is_empty() {
-            solana_program::program::invoke(&instruction, &account_infos)
+            solana_cpi::invoke(&instruction, &account_infos)
         } else {
-            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
         }
     }
 }
@@ -360,7 +336,7 @@ pub struct MintCrewToGameCpiBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
-    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(MintCrewToGameCpiBuilderInstruction {
             __program: program,
             sage_player_profile: None,
@@ -377,17 +353,14 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn sage_player_profile(
         &mut self,
-        sage_player_profile: &'b solana_program::account_info::AccountInfo<'a>,
+        sage_player_profile: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.sage_player_profile = Some(sage_player_profile);
         self
     }
     /// The [`Starbase`] account
     #[inline(always)]
-    pub fn starbase(
-        &mut self,
-        starbase: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
+    pub fn starbase(&mut self, starbase: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.starbase = Some(starbase);
         self
     }
@@ -395,7 +368,7 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn starbase_player(
         &mut self,
-        starbase_player: &'b solana_program::account_info::AccountInfo<'a>,
+        starbase_player: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.starbase_player = Some(starbase_player);
         self
@@ -404,7 +377,7 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn sage_crew_config(
         &mut self,
-        sage_crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+        sage_crew_config: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.sage_crew_config = Some(sage_crew_config);
         self
@@ -413,7 +386,7 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn crew_config(
         &mut self,
-        crew_config: &'b solana_program::account_info::AccountInfo<'a>,
+        crew_config: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.crew_config = Some(crew_config);
         self
@@ -422,7 +395,7 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn instructions_sysvar(
         &mut self,
-        instructions_sysvar: &'b solana_program::account_info::AccountInfo<'a>,
+        instructions_sysvar: &'b solana_account_info::AccountInfo<'a>,
     ) -> &mut Self {
         self.instruction.instructions_sysvar = Some(instructions_sysvar);
         self
@@ -431,7 +404,7 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_account(
         &mut self,
-        account: &'b solana_program::account_info::AccountInfo<'a>,
+        account: &'b solana_account_info::AccountInfo<'a>,
         is_writable: bool,
         is_signer: bool,
     ) -> &mut Self {
@@ -447,11 +420,7 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn add_remaining_accounts(
         &mut self,
-        accounts: &[(
-            &'b solana_program::account_info::AccountInfo<'a>,
-            bool,
-            bool,
-        )],
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
     ) -> &mut Self {
         self.instruction
             .__remaining_accounts
@@ -459,15 +428,12 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
         self.invoke_signed(&[])
     }
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
-    pub fn invoke_signed(
-        &self,
-        signers_seeds: &[&[&[u8]]],
-    ) -> solana_program::entrypoint::ProgramResult {
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
         let instruction = MintCrewToGameCpi {
             __program: self.instruction.__program,
 
@@ -507,17 +473,13 @@ impl<'a, 'b> MintCrewToGameCpiBuilder<'a, 'b> {
 
 #[derive(Clone, Debug)]
 struct MintCrewToGameCpiBuilderInstruction<'a, 'b> {
-    __program: &'b solana_program::account_info::AccountInfo<'a>,
-    sage_player_profile: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    starbase_player: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    sage_crew_config: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    crew_config: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    instructions_sysvar: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    sage_player_profile: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase: Option<&'b solana_account_info::AccountInfo<'a>>,
+    starbase_player: Option<&'b solana_account_info::AccountInfo<'a>>,
+    sage_crew_config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    crew_config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    instructions_sysvar: Option<&'b solana_account_info::AccountInfo<'a>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-    __remaining_accounts: Vec<(
-        &'b solana_program::account_info::AccountInfo<'a>,
-        bool,
-        bool,
-    )>,
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }
